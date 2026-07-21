@@ -9,28 +9,28 @@ source "$HOME/roblox-rejoin/lib/utils.sh" 2>/dev/null
 #  XOÁ CACHE TẤT CẢ PACKAGE
 # ============================================================
 adv_clear_all_cache() {
-    echo -e "\n${YELLOW}  Đang xoá cache các Roblox packages...${RESET}"
+    echo ""
+    echo -e "${YELLOW}  Dang xoa cache cac Roblox packages...${RESET}"
     line
 
     while IFS='|' read -r pkg name; do
-        echo -ne "  ${CYAN}$name${RESET} ($pkg)..."
-        # Chỉ xoá thư mục cache, không xoá data
+        echo -ne "  ${CYAN}$name${RESET} ($pkg) ... "
         local cleared=false
         for cache_dir in \
             "/data/data/$pkg/cache" \
             "/data/data/$pkg/code_cache" \
             "/sdcard/Android/data/$pkg/cache"
         do
-            if su -c "[ -d '$cache_dir' ]" 2>/dev/null; then
-                su -c "rm -rf '$cache_dir'/* 2>/dev/null"
+            if su -c "[ -d '$cache_dir' ]" </dev/null 2>/dev/null; then
+                su -c "rm -rf '$cache_dir'/* 2>/dev/null" </dev/null
                 cleared=true
             fi
         done
 
         if $cleared; then
-            echo -e " ${GREEN}✓ Done${RESET}"
+            echo -e "${GREEN}Done${RESET}"
         else
-            echo -e " ${DIM}(không có cache hoặc chưa cài)${RESET}"
+            echo -e "${DIM}khong co cache${RESET}"
         fi
     done < <(jq -r '.packages[] | "\(.pkg)|\(.name)"' "$CONFIG_FILE" 2>/dev/null)
 }
@@ -39,15 +39,16 @@ adv_clear_all_cache() {
 #  KILL TẤT CẢ ROBLOX PACKAGES
 # ============================================================
 adv_kill_all() {
-    echo -e "\n${YELLOW}  Kill tất cả Roblox packages...${RESET}"
+    echo ""
+    echo -e "${YELLOW}  Kill tat ca Roblox packages...${RESET}"
     line
 
     while IFS='|' read -r pkg name; do
-        echo -ne "  ${CYAN}$name${RESET}..."
-        su -c "am force-stop '$pkg' 2>/dev/null"
-        local pid=$(su -c "pidof '$pkg' 2>/dev/null" | awk '{print $1}')
-        [ -n "$pid" ] && su -c "kill -9 $pid 2>/dev/null"
-        echo -e " ${RED}killed${RESET}"
+        echo -ne "  ${CYAN}$name${RESET} ... "
+        su -c "am force-stop '$pkg' 2>/dev/null" </dev/null
+        local pid; pid=$(su -c "pidof '$pkg' 2>/dev/null" </dev/null | awk '{print $1}')
+        [ -n "$pid" ] && su -c "kill -9 $pid 2>/dev/null" </dev/null
+        echo -e "${RED}killed${RESET}"
     done < <(jq -r '.packages[] | "\(.pkg)|\(.name)"' "$CONFIG_FILE" 2>/dev/null)
 }
 
@@ -55,35 +56,32 @@ adv_kill_all() {
 #  ĐỔI ANDROID ID
 # ============================================================
 adv_change_android_id() {
-    echo -e "\n${YELLOW}  ⚠  CẢNH BÁO: Đổi Android ID${RESET}"
-    echo "  Android ID là định danh duy nhất của thiết bị."
-    echo "  Đổi nó có thể ảnh hưởng đến: Google Play, apps khác, license..."
-    echo "  Chỉ dùng nếu bạn biết mình đang làm gì!"
+    echo ""
+    echo -e "${YELLOW}  CANH BAO: Doi Android ID${RESET}"
+    echo "  Android ID la dinh danh duy nhat cua thiet bi."
+    echo "  Doi no co the anh huong: Google Play, apps khac, license..."
     line
 
-    if ! confirm "Bạn có chắc muốn đổi Android ID?"; then
-        echo -e "  ${DIM}Đã huỷ.${RESET}"
+    if ! confirm "Ban co chac muon doi Android ID?"; then
+        echo -e "  ${DIM}Da huy.${RESET}"
         return
     fi
 
-    # Lấy ID hiện tại
-    local current_id=$(su -c "settings get secure android_id 2>/dev/null")
-    echo -e "  ID hiện tại: ${DIM}$current_id${RESET}"
+    local current_id; current_id=$(su -c "settings get secure android_id 2>/dev/null" </dev/null)
+    echo -e "  ID hien tai: ${DIM}$current_id${RESET}"
 
-    # Tạo ID mới (hex 16 ký tự)
-    local new_id=$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 16 2>/dev/null)
+    local new_id; new_id=$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 16 2>/dev/null)
 
-    # Thử các cách set android_id
-    if su -c "settings put secure android_id '$new_id' 2>/dev/null"; then
-        local verify=$(su -c "settings get secure android_id 2>/dev/null")
+    if su -c "settings put secure android_id '$new_id' 2>/dev/null" </dev/null; then
+        local verify; verify=$(su -c "settings get secure android_id 2>/dev/null" </dev/null)
         if [ "$verify" = "$new_id" ]; then
-            echo -e "  ${GREEN}✓ Android ID mới: $new_id${RESET}"
-            log_ok "Đã đổi Android ID: $current_id → $new_id"
+            echo -e "  ${GREEN}Android ID moi: $new_id${RESET}"
+            log_ok "Da doi Android ID: $current_id -> $new_id"
         else
-            echo -e "  ${YELLOW}Settings đã đặt nhưng verify không khớp (cần reboot)${RESET}"
+            echo -e "  ${YELLOW}Da dat nhung can reboot de ap dung${RESET}"
         fi
     else
-        echo -e "  ${RED}Thất bại! Cần quyền root cao hơn hoặc thử lại.${RESET}"
+        echo -e "  ${RED}That bai! Can quyen root cao hon.${RESET}"
     fi
 }
 
@@ -95,36 +93,38 @@ adv_view_logs() {
     mapfile -t logs < <(ls -t "$log_dir"/*.log 2>/dev/null)
 
     if [ ${#logs[@]} -eq 0 ]; then
-        echo -e "\n  ${YELLOW}Chưa có log nào.${RESET}"
+        echo ""
+        echo -e "  ${YELLOW}Chua co log nao.${RESET}"
         press_enter; return
     fi
 
-    echo -e "\n${CYAN}  Log files:${RESET}"
+    echo ""
+    echo -e "  ${CYAN}Log files:${RESET}"
     line
     for i in "${!logs[@]}"; do
         local size; size=$(du -sh "${logs[$i]}" 2>/dev/null | cut -f1)
-        printf "  %2d. %-40s %s\n" "$((i+1))" "$(basename "${logs[$i]}")" "${size:-?}"
+        printf "  %2d. %-35s %s\n" "$((i+1))" "$(basename "${logs[$i]}")" "${size:-?}"
     done
     line
 
-    echo -ne "  Chọn log (1-${#logs[@]}) hoặc Enter để hủy: "
-    read -r choice
+    echo -ne "  Chon log (1-${#logs[@]}) hoac Enter huy: "
+    read -r choice </dev/tty
     [ -z "$choice" ] && return
 
     if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#logs[@]}" ]; then
         local file="${logs[$((choice-1))]}"
-        echo -e "${DIM}  ── Hiển thị 100 dòng cuối của: $(basename "$file") ──${RESET}"
+        echo -e "${DIM}  -- 100 dong cuoi: $(basename "$file") --${RESET}"
         tail -100 "$file" | more
     else
-        echo -e "  ${RED}Số không hợp lệ!${RESET}"
+        echo -e "  ${RED}So khong hop le!${RESET}"
     fi
     press_enter
 }
 
 adv_clear_logs() {
-    if confirm "Xoá tất cả log files?"; then
+    if confirm "Xoa tat ca log files?"; then
         rm -f "$LOG_DIR"/*.log
-        echo -e "  ${GREEN}✓ Đã xoá tất cả log files${RESET}"
+        echo -e "  ${GREEN}Da xoa tat ca log files${RESET}"
     fi
     sleep 1
 }
@@ -133,23 +133,24 @@ adv_clear_logs() {
 #  THÔNG TIN PACKAGES ĐÃ CÀI
 # ============================================================
 adv_show_packages_info() {
-    echo -e "\n${CYAN}  Thông tin packages Roblox:${RESET}"
+    echo ""
+    echo -e "  ${CYAN}Thong tin packages Roblox:${RESET}"
     line
-    printf "  %-20s %-30s %-15s %s\n" "Tên" "Package" "Phiên bản" "Trạng thái"
+    printf "  %-18s %-30s %-12s %s\n" "Ten" "Package" "Phien ban" "Trang thai"
     line
 
     while IFS='|' read -r pkg name; do
         local version
-        version=$(su -c "pm dump '$pkg' 2>/dev/null | grep 'versionName=' | head -1 | cut -d= -f2" 2>/dev/null)
-        local status
-        if [ -n "$version" ]; then
-            status="${GREEN}✓ Đã cài${RESET}"
+        version=$(su -c "pm dump '$pkg' 2>/dev/null | grep 'versionName=' | head -1 | cut -d= -f2" </dev/null 2>/dev/null)
+        local status_str
+        if [ -n "$version" ] && [ "$version" != "null" ]; then
+            status_str="${GREEN}Da cai${RESET}"
         else
-            status="${RED}✗ Chưa cài${RESET}"
+            status_str="${RED}Chua cai${RESET}"
             version="N/A"
         fi
-        printf "  %-20s %-30s %-15s " "$name" "$pkg" "v${version}"
-        echo -e "$status"
+        printf "  %-18s %-30s %-12s " "$name" "$pkg" "v${version}"
+        echo -e "$status_str"
     done < <(jq -r '.packages[] | "\(.pkg)|\(.name)"' "$CONFIG_FILE" 2>/dev/null)
     line
     press_enter
@@ -159,24 +160,26 @@ adv_show_packages_info() {
 #  TÌM PACKAGE NAME CỦA APP ĐANG CHẠY
 # ============================================================
 adv_find_package() {
-    echo -e "\n${CYAN}  Tìm package name của app đang foreground...${RESET}"
-    echo "  Mở app Roblox/executor của bạn lên trước, sau đó nhấn Enter."
+    echo ""
+    echo -e "  ${CYAN}Tim package name cua app dang foreground...${RESET}"
+    echo "  Mo app Roblox/executor truoc, sau do nhan Enter."
     press_enter
 
-    local pkg=$(su -c "dumpsys activity activities 2>/dev/null | grep mCurrentFocus | grep -oE '[a-zA-Z0-9.]+/[a-zA-Z0-9._]+' | head -1 | cut -d/ -f1" 2>/dev/null)
+    local pkg
+    pkg=$(su -c "dumpsys activity activities 2>/dev/null | grep mCurrentFocus | grep -oE '[a-zA-Z0-9.]+/[a-zA-Z0-9._]+' | head -1 | cut -d/ -f1" </dev/null 2>/dev/null)
 
     if [ -n "$pkg" ]; then
-        echo -e "\n  ${GREEN}Package tìm được: ${BOLD}$pkg${RESET}"
-        if confirm "Thêm package này vào danh sách?"; then
-            echo -ne "  Nhập tên hiển thị: "
-            read -r name
+        echo -e "\n  ${GREEN}Package tim duoc: ${BOLD}$pkg${RESET}"
+        if confirm "Them package nay vao danh sach?"; then
+            echo -ne "  Nhap ten hien thi: "
+            read -r name </dev/tty
             local tmp; tmp=$(mktemp)
             jq ".packages += [{\"name\":\"${name:-Unknown}\",\"pkg\":\"$pkg\",\"enabled\":true}]" \
                 "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
-            echo -e "  ${GREEN}✓ Đã thêm!${RESET}"
+            echo -e "  ${GREEN}Da them!${RESET}"
         fi
     else
-        echo -e "  ${RED}Không tìm được package. Đảm bảo app đang foreground!${RESET}"
+        echo -e "  ${RED}Khong tim duoc package. Dam bao app dang foreground!${RESET}"
     fi
     press_enter
 }
@@ -189,26 +192,25 @@ adv_setup_autoboot() {
     local boot_line="# RblxAutoRejoin autoboot"
 
     if grep -q "$boot_line" "$bashrc" 2>/dev/null; then
-        echo -e "  ${YELLOW}Auto boot đang được bật.${RESET}"
-        if confirm "Tắt auto boot?"; then
+        echo -e "  ${YELLOW}Auto boot dang BAT.${RESET}"
+        if confirm "Tat auto boot?"; then
             sed -i "/$boot_line/,+2d" "$bashrc"
             set_config ".advanced.auto_boot" "false"
-            echo -e "  ${GREEN}Đã tắt auto boot.${RESET}"
+            echo -e "  ${GREEN}Da tat auto boot.${RESET}"
         fi
     else
-        echo -e "  Auto boot CHƯA bật."
-        echo "  Khi bật, tool sẽ tự chạy mỗi khi mở Termux."
-        if confirm "Bật auto boot?"; then
+        echo -e "  Auto boot CHUA bat."
+        echo "  Khi bat, tool se tu chay moi khi mo Termux."
+        if confirm "Bat auto boot?"; then
             cat >> "$bashrc" << EOFBOOT
 
 $boot_line
-# Tự động chạy Auto Rejoin khi mở Termux
 if [ -f "$INSTALL_DIR/main.sh" ]; then
     bash "$INSTALL_DIR/main.sh" start &>/dev/null &
 fi
 EOFBOOT
             set_config ".advanced.auto_boot" "true"
-            echo -e "  ${GREEN}✓ Auto boot đã bật!${RESET}"
+            echo -e "  ${GREEN}Auto boot da bat!${RESET}"
         fi
     fi
     press_enter
@@ -221,19 +223,21 @@ menu_advanced() {
     while true; do
         clear
         print_header
-        echo -e "\n${BOLD}  ⚙  ADVANCED SETTINGS${RESET}\n"
-        echo "  1. 🗑  Xoá cache tất cả Roblox"
-        echo "  2. 💀 Kill tất cả Roblox"
-        echo "  3. 🔀 Đổi Android ID"
-        echo "  4. 📋 Xem log files"
-        echo "  5. 🗑  Xoá tất cả log"
-        echo "  6. 📦 Thông tin packages đã cài"
-        echo "  7. 🔍 Tìm package name app đang chạy"
-        echo "  8. 🔁 Cài Auto Boot"
-        echo "  9. ↩  Quay lại"
+        echo ""
+        echo -e "  ${BOLD}ADVANCED SETTINGS${RESET}"
+        echo ""
+        echo "  1. Xoa cache tat ca Roblox"
+        echo "  2. Kill tat ca Roblox"
+        echo "  3. Doi Android ID"
+        echo "  4. Xem log files"
+        echo "  5. Xoa tat ca log"
+        echo "  6. Thong tin packages da cai"
+        echo "  7. Tim package name app dang chay"
+        echo "  8. Cai Auto Boot"
+        echo "  9. Quay lai"
         line
-        echo -ne "${CYAN}  Chọn: ${RESET}"
-        read -r choice
+        echo -ne "${CYAN}  Chon: ${RESET}"
+        read -r choice </dev/tty
 
         case $choice in
             1) adv_clear_all_cache; press_enter ;;
@@ -245,7 +249,7 @@ menu_advanced() {
             7) adv_find_package ;;
             8) adv_setup_autoboot ;;
             9) break ;;
-            *) echo -e "${RED}  Lựa chọn không hợp lệ!${RESET}"; sleep 0.8 ;;
+            *) echo -e "${RED}  Lua chon khong hop le!${RESET}"; sleep 0.8 ;;
         esac
     done
 }

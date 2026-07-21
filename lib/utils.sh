@@ -14,7 +14,6 @@ CONFIG_FILE="$INSTALL_DIR/config/config.json"
 LOG_DIR="$INSTALL_DIR/logs"
 LOG_FILE="$LOG_DIR/rejoin_$(date +%Y%m%d).log"
 
-# Đảm bảo log dir tồn tại
 mkdir -p "$LOG_DIR" 2>/dev/null
 
 # ============================================================
@@ -29,9 +28,6 @@ log_info() { log "${CYAN}[INFO]${RESET} $1"; }
 # ============================================================
 #  CONFIG - Đọc/Ghi JSON
 # ============================================================
-
-# Đọc giá trị từ config.json
-# Usage: get_config ".active_package"
 get_config() {
     if [ ! -f "$CONFIG_FILE" ]; then
         echo ""
@@ -40,8 +36,6 @@ get_config() {
     jq -r "${1} // empty" "$CONFIG_FILE" 2>/dev/null
 }
 
-# Ghi giá trị vào config.json
-# Usage: set_config ".active_package" '"com.roblox.client"'
 set_config() {
     local path=$1
     local value=$2
@@ -51,40 +45,35 @@ set_config() {
         mv "$tmp" "$CONFIG_FILE"
     else
         rm -f "$tmp"
-        log_err "set_config thất bại: path=$path value=$value"
+        log_err "set_config that bai: path=$path value=$value"
         return 1
     fi
 }
 
-# Cập nhật trường stats
 update_stat() {
     local field=$1 val=$2
     set_config ".stats.$field" "\"$val\""
 }
 
-# Tăng số đếm trong stats
 increment_stat() {
     local field=$1
     local cur
     cur=$(get_config ".stats.$field // 0")
-    cur=$(echo "$cur" | tr -d '"')  # loại bỏ quotes nếu có
+    cur=$(echo "$cur" | tr -d '"')
     set_config ".stats.$field" "$((cur + 1))"
 }
 
 # ============================================================
 #  SYSTEM INFO
 # ============================================================
-
-# RAM đang dùng / tổng
 get_ram_info() {
     local total free used
     total=$(grep MemTotal /proc/meminfo 2>/dev/null | awk '{print int($2/1024)}')
     free=$(grep MemAvailable /proc/meminfo 2>/dev/null | awk '{print int($2/1024)}')
-    used=$((total - free))
+    used=$(( total - free ))
     echo "${used}MB / ${total}MB"
 }
 
-# Uptime của tool (từ thời điểm bắt đầu)
 get_uptime() {
     local start_time
     start_time=$(get_config ".stats.start_time // 0")
@@ -97,11 +86,10 @@ get_uptime() {
 
     local now diff
     now=$(date +%s)
-    diff=$((now - start_time))
-    printf '%02dh:%02dm:%02ds' $((diff/3600)) $(((diff%3600)/60)) $((diff%60))
+    diff=$(( now - start_time ))
+    printf '%02dh:%02dm:%02ds' $(( diff/3600 )) $(( (diff%3600)/60 )) $(( diff%60 ))
 }
 
-# CPU load tổng hệ thống
 get_system_cpu() {
     local cpu
     cpu=$(top -bn1 2>/dev/null | grep -E "^(%Cpu|Cpu)" | awk '{print $2}' | tr -d '%')
@@ -111,28 +99,29 @@ get_system_cpu() {
 # ============================================================
 #  UI HELPERS
 # ============================================================
-
 print_header() {
-    echo -e "${CYAN}╔══════════════════════════════════════════════╗${RESET}"
-    echo -e "${CYAN}║  ${WHITE}${BOLD}🎮 Roblox Auto Rejoin v2.0.0 ${RESET}${CYAN}            ║${RESET}"
-    echo -e "${CYAN}║  ${DIM}Termux Root Edition${RESET}${CYAN}                          ║${RESET}"
-    echo -e "${CYAN}╚══════════════════════════════════════════════╝${RESET}"
+    echo -e "${CYAN}  =================================${RESET}"
+    echo -e "${CYAN}  |  Roblox Auto Rejoin  v2.0   |${RESET}"
+    echo -e "${CYAN}  |    Termux Root Edition       |${RESET}"
+    echo -e "${CYAN}  =================================${RESET}"
 }
 
 line() {
-    echo -e "${DIM}  ──────────────────────────────────────────────${RESET}"
+    echo -e "${DIM}  ---------------------------------${RESET}"
 }
 
+# ── confirm: đọc từ /dev/tty để không bị nuốt stdin ──
 confirm() {
-    local prompt=${1:-"Bạn có chắc không?"}
-    echo -ne "${YELLOW}${prompt} (y/N): ${RESET}"
-    read -r ans
+    local prompt=${1:-"Ban co chac khong?"}
+    echo -ne "${YELLOW}  ${prompt} (y/N): ${RESET}"
+    local ans
+    read -r ans </dev/tty
     [ "${ans,,}" = "y" ]
 }
 
 press_enter() {
-    echo -ne "\n  ${DIM}Nhấn Enter để tiếp tục...${RESET}"
-    read -r
+    echo -ne "\n  ${DIM}Nhan Enter de tiep tuc...${RESET}"
+    read -r </dev/tty
 }
 
 # ============================================================
@@ -140,15 +129,15 @@ press_enter() {
 # ============================================================
 spinner() {
     local pid=$1
-    local msg=${2:-"Đang xử lý..."}
-    local spin='⣾⣽⣻⢿⡿⣟⣯⣷'
+    local msg=${2:-"Dang xu ly..."}
+    local spin='-\|/'
     local i=0
     while kill -0 "$pid" 2>/dev/null; do
-        printf "\r  ${CYAN}${spin:$((i % ${#spin})):1}${RESET} %s" "$msg"
-        i=$((i + 1))
-        sleep 0.08
+        printf "\r  [%s] %s" "${spin:$((i % 4)):1}" "$msg"
+        i=$(( i + 1 ))
+        sleep 0.15
     done
-    printf "\r%-40s\r" " "
+    printf "\r%-50s\r" " "
 }
 
 # ============================================================
