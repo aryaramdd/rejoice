@@ -38,7 +38,7 @@
 Mở Termux, paste lệnh này và nhấn Enter:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOUR_GITHUB/termux-roblox-rejoin/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Vyfuyu/Roblox-Rejoiner/main/install.sh | bash
 ```
 
 **Tool sẽ tự động:**
@@ -239,7 +239,7 @@ Hoặc tắt CPU monitor:
 # Cài thủ công:
 pkg update -y
 pkg install curl git jq bc -y
-git clone https://github.com/YOUR_GITHUB/termux-roblox-rejoin ~/roblox-rejoin
+git clone https://github.com/Vyfuyu/Roblox-Rejoiner ~/roblox-rejoin
 cp ~/roblox-rejoin/config.json.example ~/roblox-rejoin/config/config.json
 bash ~/roblox-rejoin/install.sh
 ```
@@ -338,7 +338,7 @@ A: Có, vì chạy ngầm trong Termux. Nhưng đảm bảo Termux không bị A
 cd ~/roblox-rejoin
 git pull
 # Hoặc chạy lại installer:
-curl -fsSL https://raw.githubusercontent.com/.../install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Vyfuyu/Roblox-Rejoiner/main/install.sh | bash
 ```
 
 **Q: Xoá tool như thế nào?**  

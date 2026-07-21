@@ -15,7 +15,7 @@ INSTALL_DIR="$HOME/roblox-rejoin"
 CONFIG_DIR="$INSTALL_DIR/config"
 LOG_DIR="$INSTALL_DIR/logs"
 LIB_DIR="$INSTALL_DIR/lib"
-REPO_BASE="https://raw.githubusercontent.com/YOUR_GITHUB/termux-roblox-rejoin/main"
+REPO_BASE="https://raw.githubusercontent.com/Vyfuyu/Roblox-Rejoiner/main"
 
 # ---------- Banner ----------
 print_banner() {
