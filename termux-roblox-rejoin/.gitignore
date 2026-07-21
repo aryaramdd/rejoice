@@ -1,0 +1,20 @@
+# Config cá nhân (không commit lên GitHub)
+config/config.json
+
+# Logs
+logs/
+*.log
+
+# PID files
+.rejoin.pid
+
+# Temp files
+*.tmp
+*.bak
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
