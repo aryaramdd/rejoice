@@ -1088,9 +1088,20 @@ main_install() {
     setup_alias
     print_done
 
-    # Ask to run immediately (use /dev/tty when piped via curl | bash)
+    # Ask to run immediately (handle curl | bash where stdin is the script)
     echo -ne "${CYAN}Open tool now? (y/N): ${RESET}"
-    read -r run_now </dev/tty 2>/dev/null || read -r run_now
+    if [ -t 0 ]; then
+        read -r run_now
+    else
+        # stdin is the pipe, read from terminal instead
+        if read -r -t 60 run_now </dev/tty 2>/dev/null; then
+            :
+        else
+            echo ""
+            echo -e "${DIM}No input — type 'rblx' to open the tool anytime.${RESET}"
+            run_now="n"
+        fi
+    fi
     if [ "${run_now,,}" = "y" ]; then
         exec bash "$INSTALL_DIR/main.sh"
     fi
