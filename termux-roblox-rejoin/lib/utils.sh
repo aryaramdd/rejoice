@@ -100,10 +100,8 @@ get_system_cpu() {
 #  UI HELPERS
 # ============================================================
 print_header() {
-    echo -e "${CYAN}  =================================${RESET}"
-    echo -e "${CYAN}  |  Roblox Auto Rejoin  v2.0   |${RESET}"
-    echo -e "${CYAN}  |    Termux Root Edition       |${RESET}"
-    echo -e "${CYAN}  =================================${RESET}"
+    echo -e "${CYAN}== Roblox Auto Rejoin v2.0 ==${RESET}"
+    echo -e "${CYAN}   Termux Root Edition${RESET}"
 }
 
 line() {

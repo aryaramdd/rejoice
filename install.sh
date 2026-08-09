@@ -17,13 +17,11 @@ LOG_DIR="$INSTALL_DIR/logs"
 LIB_DIR="$INSTALL_DIR/lib"
 REPO_BASE="https://raw.githubusercontent.com/aryaramdd/rejoice/main"
 
-# ---------- Banner (compact, fits narrow Termux) ----------
+# ---------- Banner (no box, never wraps) ----------
 print_banner() {
-    clear
-    echo -e "${CYAN}  ┌────────────────────────────┐${RESET}"
-    echo -e "${CYAN}  │ 🎮 ROBLOX AUTO REJOIN v2.0 │${RESET}"
-    echo -e "${CYAN}  │   Termux Root Edition      │${RESET}"
-    echo -e "${CYAN}  └────────────────────────────┘${RESET}"
+    # no clear — keeps scroll, avoids miring
+    echo -e "${CYAN}== ROBLOX AUTO REJOIN v2.0 ==${RESET}"
+    echo -e "${CYAN}   Termux Root Edition${RESET}"
     echo ""
 }
 
@@ -256,9 +254,7 @@ increment_stat() {
 
 # ---------- Small banner ----------
 print_header() {
-    echo -e "${CYAN}╔══════════════════════════════════════════════╗${RESET}"
-    echo -e "${CYAN}║  ${WHITE}${BOLD}🎮 Roblox Auto Rejoin v2.0  ${RESET}${CYAN}              ║${RESET}"
-    echo -e "${CYAN}╚══════════════════════════════════════════════╝${RESET}"
+    echo -e "${CYAN}-- Roblox Auto Rejoin v2.0 --${RESET}"
 }
 
 # ---------- Spinner animation ----------
@@ -1036,25 +1032,19 @@ EOFMENU
     log_ok "All lib files have been created!"
 }
 
-# ---------- Done ----------
+# ---------- Done (no box, never wraps) ----------
 print_done() {
     echo ""
-    echo -e "${GREEN}  ┌────────────────────────────────┐${RESET}"
-    echo -e "${GREEN}  │ ✅ INSTALLATION SUCCESSFUL!    │${RESET}"
-    echo -e "${GREEN}  └────────────────────────────────┘${RESET}"
+    echo -e "${GREEN}== INSTALLATION SUCCESSFUL ==${RESET}"
     echo ""
     echo -e "  Dir:    ${CYAN}$INSTALL_DIR${RESET}"
     echo -e "  Config: ${CYAN}$CONFIG_DIR/config.json${RESET}"
     echo -e "  Logs:   ${CYAN}$LOG_DIR${RESET}"
     echo ""
-    echo -e "  ${BOLD}HOW TO USE:${RESET}"
-    echo -e "  ${YELLOW}▶ Type 'rblx'${RESET} or ${DIM}bash $INSTALL_DIR/main.sh${RESET}"
-    echo ""
-    echo -e "  Next steps:"
-    echo "  1. Type 'rblx' to open the tool"
-    echo "  2. Menu 1: Select package"
-    echo "  3. Menu 2: Enter Place ID / VIP link"
-    echo "  4. Menu 3: Enable Auto Rejoin"
+    echo -e "  ${BOLD}HOW TO USE:${RESET} ${YELLOW}rblx${RESET}"
+    echo "  1. rblx -> Menu 1: Select package"
+    echo "  2. Menu 2: Enter Place ID / VIP link"
+    echo "  3. Menu 3: Enable Auto Rejoin"
     echo ""
 }
 

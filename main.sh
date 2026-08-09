@@ -199,11 +199,9 @@ main_menu() {
     while true; do
         clear
 
-        # ── Banner ──
-        echo -e "${CYAN}  =================================${RESET}"
-        echo -e "${CYAN}  |  ROBLOX AUTO REJOIN  v2.0   |${RESET}"
-        echo -e "${CYAN}  |    Termux Root Edition       |${RESET}"
-        echo -e "${CYAN}  =================================${RESET}"
+        # ── Banner (compact, no wide box) ──
+        echo -e "${CYAN} ROBLOX AUTO REJOIN v2.0${RESET}"
+        echo -e "${CYAN} Termux Root Edition${RESET}"
         echo ""
 
         # ── Status (su uses </dev/null to not consume stdin) ──
