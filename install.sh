@@ -1088,9 +1088,9 @@ main_install() {
     setup_alias
     print_done
 
-    # Ask to run immediately
+    # Ask to run immediately (use /dev/tty when piped via curl | bash)
     echo -ne "${CYAN}Open tool now? (y/N): ${RESET}"
-    read -r run_now
+    read -r run_now </dev/tty 2>/dev/null || read -r run_now
     if [ "${run_now,,}" = "y" ]; then
         exec bash "$INSTALL_DIR/main.sh"
     fi
