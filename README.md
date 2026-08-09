@@ -1,80 +1,80 @@
 # 🎮 Termux Roblox Auto Rejoin v2.0
 
-> Tool tự động rejoin Roblox khi bị kick/disconnect, chạy ngầm trong Termux.  
-> Hỗ trợ ROOT • Nhiều executor • VIP Server • Discord Webhook
+> Automatically rejoin Roblox when kicked/disconnected, running in the background in Termux.
+> Supports ROOT • Multiple executors • VIP Server • Discord Webhook
 
 ---
 
-## 📋 Mục Lục
+## 📋 Table of Contents
 
-- [Yêu cầu](#-yêu-cầu)
-- [Cài đặt (1 lệnh)](#-cài-đặt-1-lệnh)
-- [Hướng dẫn sử dụng](#-hướng-dẫn-sử-dụng)
-- [Cấu hình game](#-cấu-hình-game)
-- [Cấu hình webhook Discord](#-cấu-hình-webhook-discord)
-- [Khi Delta update (đổi package name)](#-khi-delta-update-đổi-package-name)
+- [Requirements](#-requirements)
+- [Installation (1 command)](#-installation-1-command)
+- [Usage](#-usage)
+- [Game Configuration](#-game-configuration)
+- [Discord Webhook Configuration](#-discord-webhook-configuration)
+- [When Delta Updates (package name changes)](#-when-delta-updates-package-name-changes)
 - [Troubleshooting](#-troubleshooting)
-- [Cấu trúc thư mục](#-cấu-trúc-thư-mục)
+- [Directory Structure](#-directory-structure)
 - [FAQ](#-faq)
 
 ---
 
-## 📌 Yêu Cầu
+## 📌 Requirements
 
-| Yêu cầu | Chi tiết |
+| Requirement | Details |
 |---------|----------|
-| **Root** | Thiết bị phải đã ROOT (Magisk/KernelSU) |
-| **Termux** | Phiên bản mới nhất từ [F-Droid](https://f-droid.org/packages/com.termux/) |
-| **Termux:API** | App Termux:API (tải cùng chỗ với Termux) |
+| **Root** | Device must be ROOTED (Magisk/KernelSU) |
+| **Termux** | Latest version from [F-Droid](https://f-droid.org/packages/com.termux/) |
+| **Termux:API** | Termux:API app (download from same place as Termux) |
 | **Android** | Android 8.0+ |
-| **Roblox** | Bất kỳ package nào: gốc, Delta, Codex, Fluxus... |
+| **Roblox** | Any package: official, Delta, Codex, Fluxus... |
 
-> ⚠️ **QUAN TRỌNG**: Dùng Termux từ **F-Droid**, KHÔNG dùng từ Google Play (phiên bản Play bị giới hạn)
+> ⚠️ **IMPORTANT**: Use Termux from **F-Droid**, NOT from Google Play (Play Store version is restricted)
 
 ---
 
-## ⚡ Cài Đặt (1 Lệnh)
+## ⚡ Installation (1 Command)
 
-Mở Termux, paste lệnh này và nhấn Enter:
+Open Termux, paste this command and press Enter:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Vyfuyu/Roblox-Rejoinerv10/main/install.sh | bash
 ```
 
-**Tool sẽ tự động:**
-1. Cập nhật Termux packages
-2. Cài dependencies (curl, git, jq, bc...)
-3. Download tất cả script files
-4. Tạo cấu hình mặc định
-5. Tạo shortcut `rblx` để dùng nhanh
+**The tool will automatically:**
+1. Update Termux packages
+2. Install dependencies (curl, git, jq, bc...)
+3. Download all script files
+4. Create default configuration
+5. Create shortcut `rblx` for quick access
 
-**Sau khi cài xong:** Gõ `rblx` để mở tool!
+**After installation:** Type `rblx` to open the tool!
 
 ---
 
-## 🚀 Hướng Dẫn Sử Dụng
+## 🚀 Usage
 
-### Lần đầu tiên
+### First time
 
 ```
-Bước 1: Cài tool (paste lệnh curl ở trên)
-Bước 2: Gõ 'rblx' để mở menu
-Bước 3: Chọn 1 → Chọn package Roblox của bạn
-Bước 4: Chọn 2 → Nhập Place ID hoặc VIP link
-Bước 5: Chọn 3 → Bắt đầu Auto Rejoin
+Step 1: Install the tool (paste the curl command above)
+Step 2: Type 'rblx' to open the menu
+Step 3: Select 1 → Choose your Roblox package
+Step 4: Select 2 → Enter Place ID or VIP link
+Step 5: Select 3 → Start Auto Rejoin
 ```
 
-### Từ lần sau
+### Next times
 
 ```bash
-rblx          # Mở menu chính
-rblx start    # Bật auto rejoin ngay (không cần menu)
-rblx stop     # Tắt auto rejoin
-rblx status   # Xem trạng thái
-rblx log      # Xem log realtime
+rblx          # Open main menu
+rblx start    # Enable auto rejoin immediately (no menu)
+rblx stop     # Disable auto rejoin
+rblx status   # View status
+rblx log      # View realtime log
 ```
 
-### Menu chính
+### Main menu
 
 ```
 ╔══════════════════════════════════════════════════╗
@@ -84,110 +84,110 @@ rblx log      # Xem log realtime
 
   Package:  com.roblox.client
   Place ID: 12345678
-  Roblox:   ● Đang chạy (PID: 1234)
-  Monitor:  ● AUTO REJOIN BẬT (PID: 5678)
+  Roblox:   ● Running (PID: 1234)
+  Monitor:  ● AUTO REJOIN ON (PID: 5678)
 
-  1. 📦 Quản lý Package Roblox
-  2. 🎮 Config Game (Place ID / VIP Link)
-  3. ▶  Bắt đầu Auto Rejoin
-  4. ■  Dừng Auto Rejoin
-  5. 📊 Xem Status
-  6. 🔔 Webhook Discord
-  7. ⏱  Cài Timing
+  1. 📦 Manage Roblox Package
+  2. 🎮 Game Config (Place ID / VIP Link)
+  3. ▶  Start Auto Rejoin
+  4. ■  Stop Auto Rejoin
+  5. 📊 View Status
+  6. 🔔 Discord Webhook
+  7. ⏱  Timing Settings
   8. ⚙  Advanced
-  9. 📋 Xem Monitor Log (realtime)
-  0. 🚪 Thoát
+  9. 📋 View Monitor Log (realtime)
+  0. 🚪 Exit
 ```
 
 ---
 
-## 🎮 Cấu Hình Game
+## 🎮 Game Configuration
 
 ### Public Game
-1. Vào Roblox → tìm game muốn farm
-2. Copy URL: `https://www.roblox.com/games/`**`12345678`**`/Ten-Game`
-3. Lấy số ID (ví dụ: `12345678`)
-4. Mở tool → Menu 2 → Chọn 1 → Nhập ID
+1. Open Roblox → find the game you want to farm
+2. Copy URL: `https://www.roblox.com/games/`**`12345678`**`/Game-Name`
+3. Get the ID number (e.g. `12345678`)
+4. Open the tool → Menu 2 → Select 1 → Enter ID
 
 ### VIP/Private Server
-1. Vào game → Copy VIP link (dạng `...?privateServerLinkCode=XXXX`)
-2. Mở tool → Menu 2 → Chọn 2 → Paste toàn bộ link
+1. Enter the game → Copy VIP link (format `...?privateServerLinkCode=XXXX`)
+2. Open the tool → Menu 2 → Select 2 → Paste the full link
 
-### Ví dụ VIP link hợp lệ
+### Valid VIP link example
 ```
 https://www.roblox.com/games/12345678/Game-Name?privateServerLinkCode=AbCdEf123456
 ```
 
 ---
 
-## 🔔 Cấu Hình Webhook Discord
+## 🔔 Discord Webhook Configuration
 
-### Cách lấy Webhook URL
-1. Mở Discord → Server của bạn
+### How to get Webhook URL
+1. Open Discord → Your server
 2. Settings (⚙) → Integrations → Webhooks
 3. New Webhook → Copy Webhook URL
-4. URL sẽ có dạng: `https://discord.com/api/webhooks/XXXX/YYYY`
+4. URL will look like: `https://discord.com/api/webhooks/XXXX/YYYY`
 
-### Cài trong tool
-1. Mở tool → Menu 6
-2. Chọn 1 → Paste webhook URL
-3. Webhook sẽ tự bật
-4. Chọn 7 để test
+### Setup in the tool
+1. Open the tool → Menu 6
+2. Select 1 → Paste webhook URL
+3. Webhook will be enabled automatically
+4. Select 7 to test
 
-### Các loại thông báo
-- 🔄 **Rejoin Triggered** — Khi phát hiện bị kick
-- ✅ **Rejoin Thành Công** — Khi vào lại game thành công
-- ❌ **Rejoin Thất Bại** — Khi thử hết số lần
+### Notification types
+- 🔄 **Rejoin Triggered** — When kick is detected
+- ✅ **Rejoin Successful** — When rejoining the game succeeds
+- ❌ **Rejoin Failed** — When all retries are exhausted
 
 ---
 
-## 🔄 Khi Delta Update (Đổi Package Name)
+## 🔄 When Delta Updates (Package Name Changes)
 
-Delta Executor thường xuyên cập nhật và **đổi package name** mỗi lần update. Đây là cách xử lý:
+Delta Executor frequently updates and **changes its package name** on each update. How to handle it:
 
-### Cách 1: Tự tìm package name mới (dễ nhất)
+### Method 1: Auto-detect new package name (easiest)
 
 ```
-1. Cài Delta phiên bản mới
-2. Mở Delta lên (để nó ở foreground)
-3. Mở Termux → gõ 'rblx'
-4. Menu 8 (Advanced) → chọn 7 (Tìm package name)
-5. Tool tự detect và hỏi có muốn thêm vào list không
+1. Install the new Delta version
+2. Open Delta (keep it in foreground)
+3. Open Termux → type 'rblx'
+4. Menu 8 (Advanced) → select 7 (Find package name)
+5. Tool will auto-detect and ask if you want to add it to the list
 ```
 
-### Cách 2: Tìm thủ công bằng command
+### Method 2: Find manually via command
 
 ```bash
-# Mở Delta lên, sau đó chạy lệnh này trong Termux:
+# Open Delta, then run this in Termux:
 su -c "dumpsys activity activities | grep mCurrentFocus | grep -oE '[a-zA-Z0-9.]+/' | tr -d '/'"
 ```
 
-### Cách 3: Dùng pm list
+### Method 3: Use pm list
 
 ```bash
-# Liệt kê tất cả package đã cài, lọc tìm Delta:
+# List all installed packages, filter for Delta:
 su -c "pm list packages | grep -i 'delta\|njnj\|vng\|executor'"
 ```
 
-### Sau khi có package name mới
+### After getting the new package name
 
 ```
-1. Mở tool → Menu 1 → nhấn [A]
-2. Nhập tên: "Delta v1.x"
-3. Nhập package name mới
-4. Nhấn [S] để chọn làm active
+1. Open the tool → Menu 1 → press [A]
+2. Enter name: "Delta v1.x"
+3. Enter the new package name
+4. Press [S] to set as active
 ```
 
 ---
 
 ## 🔧 Troubleshooting
 
-### ❌ "Thiết bị chưa ROOT"
+### ❌ "Device not ROOTED"
 
 ```
-✓ Kiểm tra: Mở Magisk → kiểm tra trạng thái root
-✓ Cấp quyền: Magisk → SuperUser → tìm Termux → Allow
-✓ Test: gõ 'su' trong Termux, nếu prompt đổi thành # là ok
+✓ Check: Open Magisk → check root status
+✓ Grant permission: Magisk → SuperUser → find Termux → Allow
+✓ Test: type 'su' in Termux, if prompt changes to # it's ok
 ```
 
 ### ❌ "jq: command not found"
@@ -196,47 +196,47 @@ su -c "pm list packages | grep -i 'delta\|njnj\|vng\|executor'"
 pkg install jq -y
 ```
 
-### ❌ Rejoin không hoạt động (app không mở)
+### ❌ Rejoin not working (app doesn't open)
 
 ```
-Nguyên nhân thường gặp:
-1. Place ID sai → kiểm tra lại số ID
-2. Package name sai → dùng Advanced → Tìm package name
-3. VIP link hết hạn → lấy link mới
-4. Roblox bị ban → thử đổi account
+Common causes:
+1. Wrong Place ID → double-check the ID
+2. Wrong package name → use Advanced → Find package name
+3. VIP link expired → get a new link
+4. Roblox banned → try another account
 
-Fix nhanh:
-1. Menu 8 → Advanced → Kill tất cả Roblox
-2. Menu 8 → Xoá cache tất cả
-3. Thử lại
+Quick fix:
+1. Menu 8 → Advanced → Kill all Roblox
+2. Menu 8 → Clear cache for all
+3. Try again
 ```
 
-### ❌ Phát hiện sai (rejoin khi đang chơi bình thường)
+### ❌ False detection (rejoin while playing normally)
 
 ```
-Điều chỉnh timing:
-→ Menu 7 (Cài Timing)
-→ Tăng check_interval lên 10s
-→ Tăng cpu_low_duration lên 30
+Adjust timing:
+→ Menu 7 (Timing Settings)
+→ Increase check_interval to 10s
+→ Increase cpu_low_duration to 30
 
-Hoặc tắt CPU monitor:
-→ Chỉnh file config.json:
+Or disable CPU monitor:
+→ Edit config.json:
    "use_cpu": false
 ```
 
-### ❌ Webhook không nhận được
+### ❌ Webhook not received
 
 ```
-1. Kiểm tra internet: ping google.com
-2. Xác nhận URL đúng (phải có discord.com/api/webhooks/)
-3. Thử: Menu 6 → Test webhook
-4. Kiểm tra Discord server chưa bị xoá webhook
+1. Check internet: ping google.com
+2. Confirm URL is correct (must contain discord.com/api/webhooks/)
+3. Try: Menu 6 → Test webhook
+4. Check Discord server hasn't deleted the webhook
 ```
 
-### ❌ Tool không cài được (lỗi mạng)
+### ❌ Tool fails to install (network error)
 
 ```bash
-# Cài thủ công:
+# Manual install:
 pkg update -y
 pkg install curl git jq bc -y
 git clone https://github.com/Vyfuyu/Roblox-Rejoinerv10v10 ~/roblox-rejoin
@@ -244,67 +244,67 @@ cp ~/roblox-rejoin/config.json.example ~/roblox-rejoin/config/config.json
 bash ~/roblox-rejoin/install.sh
 ```
 
-### ❌ "am start" không hoạt động
+### ❌ "am start" not working
 
 ```
-Kiểm tra quyền root:
+Check root permission:
 su -c "am start --help"
 
-Nếu lỗi permission denied:
-→ Mở Magisk → SuperUser → cấp quyền Termux
+If permission denied:
+→ Open Magisk → SuperUser → grant Termux permission
 → Restart Termux
 ```
 
-### ❌ Tool chạy nhưng Roblox không vào game
+### ❌ Tool runs but Roblox doesn't join the game
 
 ```
-Deep link có thể bị chặn ở một số ROM:
-1. Thử mở Roblox thủ công trước
-2. Kiểm tra Roblox có phải default app cho roblox:// scheme không
+Deep link may be blocked on some ROMs:
+1. Try opening Roblox manually first
+2. Check if Roblox is the default app for roblox:// scheme
 
 Fix:
 su -c "am start -a android.intent.action.VIEW -d 'roblox://placeId=12345678'"
-→ Nếu mở được → problem ở package name
-→ Nếu không mở → ROM chặn deep link
+→ If it opens → problem is package name
+→ If it doesn't open → ROM blocks deep link
 ```
 
 ---
 
-## ⏱ Cài Đặt Timing Khuyến Nghị
+## ⏱ Recommended Timing Settings
 
-| Tình huống | check_interval | rejoin_delay | cpu_low_duration |
+| Situation | check_interval | rejoin_delay | cpu_low_duration |
 |-----------|----------------|--------------|-----------------|
-| **Bình thường** | 5s | 8s | 20 |
-| **Game hay lag** | 8s | 12s | 30 |
-| **Server không ổn định** | 3s | 5s | 15 |
-| **Pin tiết kiệm** | 10s | 10s | 40 |
+| **Normal** | 5s | 8s | 20 |
+| **Laggy game** | 8s | 12s | 30 |
+| **Unstable server** | 3s | 5s | 15 |
+| **Battery saver** | 10s | 10s | 40 |
 
 ---
 
-## 📁 Cấu Trúc Thư Mục
+## 📁 Directory Structure
 
 ```
-~/roblox-rejoin/              ← Thư mục cài đặt
-├── main.sh                   ← File chính, điểm vào
+~/roblox-rejoin/              ← Installation directory
+├── main.sh                   ← Main file, entry point
 ├── config/
-│   └── config.json           ← Cấu hình của bạn
+│   └── config.json           ← Your configuration
 ├── logs/
-│   └── rejoin_YYYYMMDD.log   ← Log hàng ngày
+│   └── rejoin_YYYYMMDD.log   ← Daily log
 └── lib/
-    ├── utils.sh              ← Hàm tiện ích chung
-    ├── detect.sh             ← Hệ thống phát hiện disconnect
-    ├── rejoin.sh             ← Logic thực hiện rejoin
-    ├── menu.sh               ← Giao diện menu
+    ├── utils.sh              ← Shared utility functions
+    ├── detect.sh             ← Disconnect detection system
+    ├── rejoin.sh             ← Rejoin execution logic
+    ├── menu.sh               ← Menu interface
     ├── webhook.sh            ← Discord webhook
-    └── advanced.sh           ← Tính năng nâng cao
+    └── advanced.sh           ← Advanced features
 ```
 
 ```
-repo/                         ← Thư mục GitHub repo
-├── install.sh                ← Installer 1 lệnh
-├── main.sh                   ← Script chính
-├── config.json.example       ← Config mẫu
-├── README.md                 ← File này
+repo/                         ← GitHub repo
+├── install.sh                ← One-command installer
+├── main.sh                   ← Main script
+├── config.json.example       ← Example config
+├── README.md                 ← This file
 └── lib/
     ├── utils.sh
     ├── detect.sh
@@ -318,34 +318,34 @@ repo/                         ← Thư mục GitHub repo
 
 ## ❓ FAQ
 
-**Q: Tool có an toàn không?**  
-A: Tool chỉ dùng các lệnh Android tiêu chuẩn (`am`, `dumpsys`, `pm`). Không inject, không chỉnh game. Hoàn toàn client-side.
+**Q: Is the tool safe?**
+A: The tool only uses standard Android commands (`am`, `dumpsys`, `pm`). No injection, no game modification. Completely client-side.
 
-**Q: Có bị Roblox ban không?**  
-A: Auto rejoin bản thân không vi phạm ToS. Tuy nhiên nếu dùng executor (Delta, Codex...) thì executor mới là nguyên nhân ban.
+**Q: Will I get banned by Roblox?**
+A: Auto rejoin itself does not violate ToS. However if you use an executor (Delta, Codex...) the executor is the ban reason.
 
-**Q: Tool có tốn pin không?**  
-A: Check mỗi 5s = nhẹ. Logcat monitor tốn hơn một chút. Tắt `use_logcat: false` để tiết kiệm pin.
+**Q: Does the tool drain battery?**
+A: Checking every 5s is lightweight. Logcat monitoring costs a bit more. Set `use_logcat: false` to save battery.
 
-**Q: Có thể chạy nhiều package cùng lúc không?**  
-A: Hiện tại mỗi lần chỉ monitor 1 package (active package). Muốn đổi → Menu 1 → Chọn package khác.
+**Q: Can I run multiple packages at once?**
+A: Currently only 1 package is monitored at a time (active package). To change → Menu 1 → Select another package.
 
-**Q: Tool có hoạt động khi tắt màn hình không?**  
-A: Có, vì chạy ngầm trong Termux. Nhưng đảm bảo Termux không bị Android kill (Cài Termux:Boot, hoặc giữ Termux trong recent tasks).
+**Q: Does the tool work when screen is off?**
+A: Yes, because it runs in the background in Termux. But make sure Termux is not killed by Android (Install Termux:Boot, or keep Termux in recent tasks).
 
-**Q: Làm sao cập nhật tool?**  
+**Q: How to update the tool?**
 ```bash
 cd ~/roblox-rejoin
 git pull
-# Hoặc chạy lại installer:
+# Or run the installer again:
 curl -fsSL https://raw.githubusercontent.com/Vyfuyu/Roblox-Rejoinerv10/main/install.sh | bash
 ```
 
-**Q: Xoá tool như thế nào?**  
+**Q: How to uninstall the tool?**
 ```bash
 rm -rf ~/roblox-rejoin
 rm -f "$PREFIX/bin/rblx"
-# Xoá alias trong ~/.bashrc nếu có
+# Remove alias in ~/.bashrc if any
 ```
 
 ---
@@ -353,23 +353,23 @@ rm -f "$PREFIX/bin/rblx"
 ## 📝 Changelog
 
 ### v2.0.0
-- Hệ thống detect đa lớp (5 phương pháp)
-- Discord webhook với embed đẹp
-- Menu hoàn toàn mới, chuyên nghiệp hơn
-- Advanced menu: tìm package tự động, auto boot
-- Timing config chi tiết
-- Log hàng ngày tự động
+- Multi-layer detection system (5 methods)
+- Discord webhook with nice embeds
+- Completely new, more professional menu
+- Advanced menu: auto package finder, auto boot
+- Detailed timing config
+- Automatic daily logging
 
 ### v1.0.0
-- Bản đầu tiên
+- Initial release
 
 ---
 
 ## ⚠️ Disclaimer
 
-Tool này chỉ phục vụ mục đích học tập và nghiên cứu.  
-Sử dụng tool cùng với các executor vi phạm Roblox ToS là trách nhiệm của người dùng.  
-Tác giả không chịu trách nhiệm về việc account bị ban.
+This tool is for educational and research purposes only.
+Using the tool together with executors that violate Roblox ToS is the user's responsibility.
+The author is not responsible for account bans.
 
 ---
 

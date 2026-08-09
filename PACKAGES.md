@@ -1,45 +1,45 @@
-# 📦 Danh Sách Package Name Roblox Executor
+# Package List - Roblox Executor Package Names
 
-> Cập nhật thường xuyên. Nếu package name đổi, tìm bằng Advanced → Menu 7.
+> Updated regularly. If package name changes, find it via Advanced -> Menu 7.
 
-## Roblox Gốc
-| Tên | Package Name | Ghi chú |
+## Official Roblox
+| Name | Package Name | Notes |
 |-----|-------------|---------|
-| Roblox Official | `com.roblox.client` | Stable, ít thay đổi |
+| Roblox Official | `com.roblox.client` | Stable, rarely changes |
 
-## Executor Phổ Biến
-| Tên | Package Name (mới nhất) | Ghi chú |
+## Popular Executors
+| Name | Package Name (latest) | Notes |
 |-----|------------------------|---------|
-| Delta Executor | `com.vng.njnj` | **Thay đổi thường xuyên!** |
-| Delta Executor (cũ) | `com.delta.executor` | Phiên bản cũ |
+| Delta Executor | `com.vng.njnj` | **Changes frequently!** |
+| Delta Executor (old) | `com.delta.executor` | Old version |
 | Codex | `com.codex.client` | |
 | Fluxus | `com.fluxteam.fluxus` | |
 | Arceus X Neo | `com.arceusx.neo` | |
 | Hydrogen | `com.hydrogen.executor` | |
 | Vegax | `com.vegax.android` | |
 
-## ⚠️ Lưu Ý Quan Trọng
+## Important Note
 
-### Delta Executor thay đổi package name rất thường xuyên!
+### Delta Executor changes package name very frequently!
 
-**Cách tìm package name mới sau mỗi lần Delta update:**
+**How to find new package name after each Delta update:**
 
 ```bash
-# Mở Delta lên, sau đó chạy lệnh này:
+# Open Delta, then run this command:
 su -c "dumpsys activity activities | grep mCurrentFocus"
-# Kết quả: mCurrentFocus=Window{... com.PACKAGE.NAME/com.PACKAGE.NAME.MainActivity}
-#                                       ^^^^^^^^^^^^^^^^ đây là package name
+# Result: mCurrentFocus=Window{... com.PACKAGE.NAME/com.PACKAGE.NAME.MainActivity}
+#                                       ^^^^^^^^^^^^^^^^ this is the package name
 ```
 
-**Hoặc dùng menu tool:**
+**Or use the tool menu:**
 ```
-rblx → Menu 8 (Advanced) → Chọn 7 (Tìm package name app đang chạy)
+rblx -> Menu 8 (Advanced) -> Select 7 (Find package name of running app)
 ```
 
-## Cách Verify Package Name
+## How to Verify Package Name
 ```bash
-# Kiểm tra package đã cài chưa:
+# Check if package is installed:
 su -c "pm path com.your.package.name"
-# Nếu có kết quả → đã cài
-# Nếu không → chưa cài hoặc package name sai
+# If result exists -> installed
+# If not -> not installed or wrong package name
 ```

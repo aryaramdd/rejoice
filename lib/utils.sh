@@ -1,9 +1,9 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # ============================================================
-#  UTILS.SH - Hàm tiện ích dùng chung
+#  UTILS.SH - Shared utility functions
 # ============================================================
 
-# ---------- ANSI Colors ----------
+# ---------- Colors ----------
 RED='\033[0;31m';    GREEN='\033[0;32m';  YELLOW='\033[1;33m'
 BLUE='\033[0;34m';   CYAN='\033[0;36m';  MAGENTA='\033[0;35m'
 WHITE='\033[1;37m';  BOLD='\033[1m';     DIM='\033[2m'; RESET='\033[0m'
@@ -26,7 +26,7 @@ log_err()  { log "${RED}[ERR]${RESET}  $1"; }
 log_info() { log "${CYAN}[INFO]${RESET} $1"; }
 
 # ============================================================
-#  CONFIG - Đọc/Ghi JSON
+#  CONFIG - Read/Write JSON
 # ============================================================
 get_config() {
     if [ ! -f "$CONFIG_FILE" ]; then
@@ -45,7 +45,7 @@ set_config() {
         mv "$tmp" "$CONFIG_FILE"
     else
         rm -f "$tmp"
-        log_err "set_config that bai: path=$path value=$value"
+        log_err "set_config failed: path=$path value=$value"
         return 1
     fi
 }
@@ -110,9 +110,9 @@ line() {
     echo -e "${DIM}  ---------------------------------${RESET}"
 }
 
-# ── confirm: đọc từ /dev/tty để không bị nuốt stdin ──
+# ── confirm: read from /dev/tty to avoid consuming stdin ──
 confirm() {
-    local prompt=${1:-"Ban co chac khong?"}
+    local prompt=${1:-"Are you sure?"}
     echo -ne "${YELLOW}  ${prompt} (y/N): ${RESET}"
     local ans
     read -r ans </dev/tty
@@ -120,7 +120,7 @@ confirm() {
 }
 
 press_enter() {
-    echo -ne "\n  ${DIM}Nhan Enter de tiep tuc...${RESET}"
+    echo -ne "\n  ${DIM}Press Enter to continue...${RESET}"
     read -r </dev/tty
 }
 
@@ -129,7 +129,7 @@ press_enter() {
 # ============================================================
 spinner() {
     local pid=$1
-    local msg=${2:-"Dang xu ly..."}
+    local msg=${2:-"Processing..."}
     local spin='-\|/'
     local i=0
     while kill -0 "$pid" 2>/dev/null; do

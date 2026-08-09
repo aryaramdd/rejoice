@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # ============================================================
 #  TERMUX ROBLOX AUTO REJOIN - ONE-COMMAND INSTALLER
-#  Chỉ cần paste 1 lệnh, mọi thứ tự động cài đặt
+#  Just paste 1 command, everything installs automatically
 #  Usage: curl -fsSL https://raw.githubusercontent.com/YOUR/REPO/main/install.sh | bash
 # ============================================================
 
@@ -10,7 +10,7 @@ RED='\033[0;31m';    GREEN='\033[0;32m';  YELLOW='\033[1;33m'
 BLUE='\033[0;34m';   CYAN='\033[0;36m';  MAGENTA='\033[0;35m'
 WHITE='\033[1;37m';  BOLD='\033[1m';     RESET='\033[0m'
 
-# ---------- Thư mục cài đặt ----------
+# ---------- Installation directory ----------
 INSTALL_DIR="$HOME/roblox-rejoin"
 CONFIG_DIR="$INSTALL_DIR/config"
 LOG_DIR="$INSTALL_DIR/logs"
@@ -47,50 +47,50 @@ log_warn()    { echo -e "${YELLOW}[!]${RESET} $1"; }
 log_error()   { echo -e "${RED}[✗]${RESET} $1"; }
 log_step()    { echo -e "${CYAN}[→]${RESET} ${BOLD}$1${RESET}"; }
 
-# ---------- Kiểm tra root ----------
+# ---------- Check root ----------
 check_root() {
-    log_step "Kiểm tra quyền ROOT..."
+    log_step "Checking ROOT permission..."
     if ! su -c "echo ok" &>/dev/null; then
-        log_error "Thiết bị chưa ROOT hoặc Termux chưa được cấp quyền su!"
-        echo -e "${YELLOW}Hướng dẫn: Mở Magisk → cấp phép SuperUser cho Termux${RESET}"
+        log_error "Device is not ROOTED or Termux has not been granted su permission!"
+        echo -e "${YELLOW}Guide: Open Magisk -> grant SuperUser permission to Termux${RESET}"
         exit 1
     fi
     log_info "Root OK!"
 }
 
-# ---------- Cập nhật & cài packages ----------
+# ---------- Update & install packages ----------
 install_dependencies() {
-    log_step "Cập nhật pkg repositories..."
+    log_step "Updating pkg repositories..."
     pkg update -y -o Dpkg::Options::="--force-confold" 2>/dev/null | tail -1
 
-    log_step "Cài đặt dependencies..."
+    log_step "Installing dependencies..."
     local deps=("curl" "git" "jq" "bc" "busybox" "termux-api" "ncurses-utils")
     for dep in "${deps[@]}"; do
         if ! command -v "$dep" &>/dev/null; then
-            echo -ne "  ${CYAN}Cài ${dep}...${RESET}"
+            echo -ne "  ${CYAN}Install ${dep}...${RESET}"
             if pkg install -y "$dep" &>/dev/null; then
                 echo -e " ${GREEN}✓${RESET}"
             else
-                echo -e " ${YELLOW}bỏ qua (không bắt buộc)${RESET}"
+                echo -e " ${YELLOW}skipped (optional)${RESET}"
             fi
         else
-            echo -e "  ${GREEN}✓${RESET} ${dep} đã có"
+            echo -e "  ${GREEN}✓${RESET} ${dep} already installed"
         fi
     done
 }
 
-# ---------- Tạo cấu trúc thư mục ----------
+# ---------- Creating directory structure ----------
 create_directories() {
-    log_step "Tạo cấu trúc thư mục..."
+    log_step "Creating directory structure..."
     mkdir -p "$INSTALL_DIR" "$CONFIG_DIR" "$LOG_DIR" "$LIB_DIR"
-    log_info "Thư mục: $INSTALL_DIR"
+    log_info "Directory: $INSTALL_DIR"
 }
 
-# ---------- Download files từ repo ----------
+# ---------- Download files from repo ----------
 download_files() {
-    log_step "Tải script files..."
+    log_step "Downloading script files..."
 
-    # Danh sách files cần download
+    # List of files to download
     declare -A FILES=(
         ["$INSTALL_DIR/main.sh"]="main.sh"
         ["$LIB_DIR/detect.sh"]="lib/detect.sh"
@@ -104,7 +104,7 @@ download_files() {
     local success=true
     for dest in "${!FILES[@]}"; do
         local src="${FILES[$dest]}"
-        echo -ne "  ${CYAN}Tải ${src}...${RESET}"
+        echo -ne "  ${CYAN}Download ${src}...${RESET}"
         if curl -fsSL "$REPO_BASE/$src" -o "$dest" 2>/dev/null; then
             chmod +x "$dest"
             echo -e " ${GREEN}✓${RESET}"
@@ -114,24 +114,24 @@ download_files() {
         fi
     done
 
-    # Nếu không download được (chưa có repo), tạo inline
+    # If download fails (repo not available), create inline
     if [ "$success" = false ]; then
-        log_warn "Không tải được từ repo → tạo files tích hợp..."
+        log_warn "Failed to download from repo -> creating integrated files..."
         create_inline_files
     fi
 }
 
-# ---------- Tạo config mẫu ----------
+# ---------- Create default config ----------
 create_default_config() {
     local config_file="$CONFIG_DIR/config.json"
     if [ ! -f "$config_file" ]; then
-        log_step "Tạo file config mặc định..."
+        log_step "Creating default config file..."
         cat > "$config_file" << 'EOFCONFIG'
 {
   "version": "2.0.0",
   "packages": [
     {
-      "name": "Roblox Gốc",
+      "name": "Official Roblox",
       "pkg": "com.roblox.client",
       "enabled": true
     },
@@ -190,25 +190,25 @@ create_default_config() {
   }
 }
 EOFCONFIG
-        log_info "Config tạo tại: $config_file"
+        log_info "Config created at: $config_file"
     fi
 }
 
-# ---------- Tạo shortcut lệnh ----------
+# ---------- Create shortcut command ----------
 create_shortcut() {
-    log_step "Tạo lệnh shortcut..."
+    log_step "Creating shortcut command..."
 
-    # Tạo script khởi động trong $PATH
+    # Create startup script in $PATH
     local shortcut="$PREFIX/bin/rblx"
     cat > "$shortcut" << EOFSHORTCUT
 #!/data/data/com.termux/files/usr/bin/bash
 exec bash "$INSTALL_DIR/main.sh" "\$@"
 EOFSHORTCUT
     chmod +x "$shortcut"
-    log_info "Shortcut tạo: bây giờ chỉ cần gõ 'rblx' để mở tool!"
+    log_info "Shortcut created: just type 'rblx' to open the tool!"
 }
 
-# ---------- Tạo .bashrc alias ----------
+# ---------- Create .bashrc alias ----------
 setup_alias() {
     local bashrc="$HOME/.bashrc"
     if ! grep -q "roblox-rejoin" "$bashrc" 2>/dev/null; then
@@ -218,16 +218,16 @@ setup_alias() {
     fi
 }
 
-# ---------- Tạo inline files (fallback khi không có repo) ----------
+# ---------- Create inline files (fallback when repo not available) ----------
 create_inline_files() {
-    # Tạo lib/utils.sh
+    # Create lib/utils.sh
     cat > "$LIB_DIR/utils.sh" << 'EOFUTILS'
 #!/data/data/com.termux/files/usr/bin/bash
 # ============================================================
-#  UTILS - Các hàm tiện ích dùng chung
+#  UTILS - Shared utility functions
 # ============================================================
 
-# Màu sắc
+# Colors
 RED='\033[0;31m';    GREEN='\033[0;32m';  YELLOW='\033[1;33m'
 BLUE='\033[0;34m';   CYAN='\033[0;36m';  MAGENTA='\033[0;35m'
 WHITE='\033[1;37m';  BOLD='\033[1m';     DIM='\033[2m'; RESET='\033[0m'
@@ -243,20 +243,20 @@ log_warn() { log "${YELLOW}[WARN]${RESET} $1"; }
 log_err()  { log "${RED}[ERR]${RESET}  $1"; }
 log_info() { log "${CYAN}[INFO]${RESET} $1"; }
 
-# ---------- Đọc config ----------
+# ---------- Read config ----------
 get_config() {
     # $1 = path json (vd: .active_package)
     jq -r "$1 // empty" "$CONFIG_FILE" 2>/dev/null
 }
 
-# ---------- Ghi config ----------
+# ---------- Write config ----------
 set_config() {
     # $1 = path, $2 = value
     local tmp=$(mktemp)
     jq "$1 = $2" "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
 }
 
-# ---------- Cập nhật stats ----------
+# ---------- Update stats ----------
 update_stat() {
     local field=$1 val=$2
     set_config ".stats.$field" "\"$val\""
@@ -268,7 +268,7 @@ increment_stat() {
     set_config ".stats.$field" "$((cur + 1))"
 }
 
-# ---------- Banner nhỏ ----------
+# ---------- Small banner ----------
 print_header() {
     echo -e "${CYAN}╔══════════════════════════════════════════════╗${RESET}"
     echo -e "${CYAN}║  ${WHITE}${BOLD}🎮 Roblox Auto Rejoin v2.0  ${RESET}${CYAN}              ║${RESET}"
@@ -277,7 +277,7 @@ print_header() {
 
 # ---------- Spinner animation ----------
 spinner() {
-    local pid=$1 msg=${2:-"Đang xử lý..."}
+    local pid=$1 msg=${2:-"Processing..."}
     local spin='⣾⣽⣻⢿⡿⣟⣯⣷'
     local i=0
     while kill -0 "$pid" 2>/dev/null; do
@@ -288,14 +288,14 @@ spinner() {
     printf "\r"
 }
 
-# ---------- Kiểm tra internet ----------
+# ---------- Check internet ----------
 check_internet() {
     curl -s --max-time 5 "https://8.8.8.8" &>/dev/null
 }
 
-# ---------- Lấy thông tin hệ thống ----------
+# ---------- Get system info ----------
 get_cpu_usage() {
-    # Lấy CPU usage tổng (%)
+    # Get total CPU usage (%)
     top -bn1 2>/dev/null | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1 || echo "0"
 }
 
@@ -314,30 +314,30 @@ get_uptime() {
     printf '%02dh:%02dm:%02ds' $((diff/3600)) $(((diff%3600)/60)) $((diff%60))
 }
 
-# ---------- Separator đẹp ----------
+# ---------- Nice separator ----------
 line() { echo -e "${DIM}────────────────────────────────────────────${RESET}"; }
 EOFUTILS
 
-    # Tạo lib/detect.sh
+    # Create lib/detect.sh
     cat > "$LIB_DIR/detect.sh" << 'EOFDETECT'
 #!/data/data/com.termux/files/usr/bin/bash
 # ============================================================
-#  DETECT - Hệ thống phát hiện "không còn trong server"
-#  Kết hợp đa phương pháp để giảm false positive
+#  DETECT - System to detect "no longer in server"
+#  Combines multiple methods to minimize false positives
 # ============================================================
 
 source "$HOME/roblox-rejoin/lib/utils.sh"
 
-# Biến theo dõi trạng thái
+# Status tracking variable
 CPU_LOW_COUNTER=0
 LAST_ACTIVITY=""
 DETECT_RUNNING=false
 
-# ---------- Phương pháp 1: Kiểm tra top activity ----------
-# Nếu Roblox không phải top activity → đang ở màn home hoặc crash
+# ---------- Method 1: Check top activity ----------
+# If Roblox is not top activity -> at home screen or crashed
 check_activity() {
     local pkg=$1
-    # dumpsys activity: lấy top activity hiện tại
+    # dumpsys activity: get current top activity
     local top_activity=$(su -c "dumpsys activity activities 2>/dev/null" | \
         grep -E "mCurrentFocus|mFocusedActivity" | head -1 | \
         grep -o "[a-zA-Z0-9._]*/[a-zA-Z0-9._]*" | head -1)
@@ -349,10 +349,10 @@ check_activity() {
     fi
 }
 
-# ---------- Phương pháp 2: Kiểm tra process đang chạy ----------
+# ---------- Method 2: Check running process ----------
 check_process() {
     local pkg=$1
-    # Kiểm tra PID của package
+    # Check PID of package
     local pid=$(su -c "pidof $pkg 2>/dev/null || ps -A 2>/dev/null | grep $pkg | grep -v grep | awk '{print \$1}' | head -1")
     if [ -n "$pid" ] && [ "$pid" -gt 0 ] 2>/dev/null; then
         echo "running:$pid"
@@ -361,27 +361,27 @@ check_process() {
     fi
 }
 
-# ---------- Phương pháp 3: Logcat monitoring ----------
-# Phát hiện keywords báo hiệu disconnect/error
+# ---------- Method 3: Logcat monitoring ----------
+# Detect keywords indicating disconnect/error
 check_logcat() {
     local pkg=$1
-    # Các keyword báo hiệu đã bị kick/disconnect
+    # Keywords indicating kicked/disconnected
     local keywords="Disconnected|ErrorPrompt|Connection failed|Kicked|Teleport failed|Game closed|Rejoining|LostConnection|PlaceId mismatch"
 
-    # Lấy logcat 3 giây gần nhất của package
+    # Get last 3 seconds of logcat for package
     local result=$(su -c "timeout 2 logcat -d -t 50 2>/dev/null" | \
         grep -E "$keywords" | tail -5)
 
     if [ -n "$result" ]; then
-        log_warn "Logcat phát hiện: $result"
+        log_warn "Logcat detected: $result"
         echo "disconnected"
     else
         echo "connected"
     fi
 }
 
-# ---------- Phương pháp 4: CPU usage monitoring ----------
-# Nếu CPU thấp bất thường lâu → app đang ở idle/home
+# ---------- Method 4: CPU usage monitoring ----------
+# If CPU stays abnormally low -> app is idle/home
 check_cpu_for_pkg() {
     local pkg=$1
     local threshold=$(get_config ".detection.cpu_threshold // 5")
@@ -390,9 +390,9 @@ check_cpu_for_pkg() {
     local pid=$(su -c "pidof $pkg 2>/dev/null" | awk '{print $1}')
     if [ -z "$pid" ]; then echo "no_process"; return; fi
 
-    # Đọc CPU usage của process cụ thể
+    # Read CPU usage of specific process
     local cpu=$(su -c "cat /proc/$pid/stat 2>/dev/null" | awk '{print ($14+$15)}')
-    # So sánh đơn giản — nếu < threshold liên tục → idle
+    # Simple comparison - if < threshold continuously -> idle
     if [ "${cpu:-0}" -lt "$threshold" ] 2>/dev/null; then
         CPU_LOW_COUNTER=$((CPU_LOW_COUNTER + 1))
     else
@@ -406,32 +406,32 @@ check_cpu_for_pkg() {
     fi
 }
 
-# ---------- Phương pháp 5: Kiểm tra màn hình có sáng không ----------
+# ---------- Method 5: Check if screen is on ----------
 check_screen() {
     local state=$(su -c "dumpsys power 2>/dev/null | grep 'mWakefulness'" | \
         grep -o "Awake\|Asleep\|Dozing" | head -1)
     echo "${state:-Unknown}"
 }
 
-# ---------- MASTER DETECT: Tổng hợp tất cả phương pháp ----------
+# ---------- MASTER DETECT: Combine all methods ----------
 detect_need_rejoin() {
     local pkg=$1
     local use_logcat=$(get_config ".detection.use_logcat // true")
     local use_activity=$(get_config ".detection.use_activity // true")
     local use_cpu=$(get_config ".detection.use_cpu // true")
 
-    local score=0          # Tích lũy điểm "cần rejoin"
+    local score=0          # Accumulate "need rejoin" score
     local reasons=()
 
-    # --- Kiểm tra process tồn tại ---
+    # --- Check if process exists ---
     local proc_status=$(check_process "$pkg")
     if [ "$proc_status" = "dead" ]; then
-        log_warn "Process $pkg đã chết!"
+        log_warn "Process $pkg is dead!"
         echo "rejoin:process_dead"
         return
     fi
 
-    # --- Kiểm tra activity (ưu tiên cao) ---
+    # --- Check activity (high priority) ---
     if [ "$use_activity" = "true" ]; then
         local act=$(check_activity "$pkg")
         if [ "$act" = "background" ]; then
@@ -440,7 +440,7 @@ detect_need_rejoin() {
         fi
     fi
 
-    # --- Kiểm tra logcat ---
+    # --- Check logcat ---
     if [ "$use_logcat" = "true" ]; then
         local lcat=$(check_logcat "$pkg")
         if [ "$lcat" = "disconnected" ]; then
@@ -449,7 +449,7 @@ detect_need_rejoin() {
         fi
     fi
 
-    # --- Kiểm tra CPU ---
+    # --- Check CPU ---
     if [ "$use_cpu" = "true" ]; then
         local cpu_stat=$(check_cpu_for_pkg "$pkg")
         if [ "$cpu_stat" = "idle_too_long" ]; then
@@ -458,7 +458,7 @@ detect_need_rejoin() {
         fi
     fi
 
-    # --- Quyết định ---
+    # --- Decision ---
     if [ "$score" -ge 3 ]; then
         local reason_str=$(IFS='+'; echo "${reasons[*]}")
         echo "rejoin:$reason_str"
@@ -468,11 +468,11 @@ detect_need_rejoin() {
 }
 EOFDETECT
 
-    # Tạo lib/rejoin.sh
+    # Create lib/rejoin.sh
     cat > "$LIB_DIR/rejoin.sh" << 'EOFREJOIN'
 #!/data/data/com.termux/files/usr/bin/bash
 # ============================================================
-#  REJOIN - Thực hiện rejoin game
+#  REJOIN - Execute game rejoin
 # ============================================================
 
 source "$HOME/roblox-rejoin/lib/utils.sh"
@@ -481,40 +481,40 @@ source "$HOME/roblox-rejoin/lib/webhook.sh"
 # ---------- Kill Roblox app ----------
 kill_roblox() {
     local pkg=$1
-    log_info "Đang kill $pkg..."
+    log_info "Killing $pkg..."
     su -c "am force-stop $pkg 2>/dev/null"
     sleep 1
-    # Kill fallback bằng PID
+    # Kill fallback by PID
     local pid=$(su -c "pidof $pkg 2>/dev/null")
     [ -n "$pid" ] && su -c "kill -9 $pid 2>/dev/null"
     sleep 1
-    log_ok "Đã kill $pkg"
+    log_ok "Killed $pkg"
 }
 
-# ---------- Xoá cache Roblox ----------
+# ---------- Clear Roblox cache ----------
 clear_roblox_cache() {
     local pkg=$1
-    log_info "Đang xoá cache $pkg..."
-    su -c "pm clear $pkg 2>/dev/null" && log_ok "Cache đã xoá"
+    log_info "Clearing cache $pkg..."
+    su -c "pm clear $pkg 2>/dev/null" && log_ok "Cache cleared"
 }
 
-# ---------- Build deep link để join game ----------
+# ---------- Build deep link to join game ----------
 build_deeplink() {
     local place_id=$(get_config ".game.place_id")
     local access_code=$(get_config ".game.access_code")
     local is_private=$(get_config ".game.is_private")
     local full_link=$(get_config ".game.full_link")
 
-    # Nếu có full link (vip link) → parse
+    # If full link (vip link) exists -> parse
     if [ -n "$full_link" ] && [ "$full_link" != "null" ]; then
-        # Extract từ URL dạng: https://www.roblox.com/games/PLACEID?privateServerLinkCode=CODE
+        # Extract from URL format: https://www.roblox.com/games/PLACEID?privateServerLinkCode=CODE
         place_id=$(echo "$full_link" | grep -oE '/games/[0-9]+' | grep -oE '[0-9]+')
         access_code=$(echo "$full_link" | grep -oE 'privateServerLinkCode=[^&]+' | cut -d= -f2)
         is_private="true"
     fi
 
     if [ -z "$place_id" ]; then
-        log_err "Chưa cấu hình Place ID!"
+        log_err "Place ID not configured!"
         return 1
     fi
 
@@ -526,22 +526,22 @@ build_deeplink() {
     fi
 }
 
-# ---------- Mở app bằng deep link (ưu tiên) ----------
+# ---------- Open app via deep link (priority) ----------
 rejoin_deeplink() {
     local pkg=$1
     local deeplink=$(build_deeplink)
     [ $? -ne 0 ] && return 1
 
-    log_info "Rejoin bằng deep link: $deeplink"
+    log_info "Rejoin via deep link: $deeplink"
     su -c "am start -a android.intent.action.VIEW -d '$deeplink' -p '$pkg' --activity-clear-task 2>/dev/null"
     return $?
 }
 
-# ---------- Fallback: Mở app activity trực tiếp ----------
+# ---------- Fallback: Open app activity directly ----------
 rejoin_direct() {
     local pkg=$1
-    log_warn "Fallback: mở app $pkg trực tiếp..."
-    # Lấy main activity của package
+    log_warn "Fallback: open app $pkg directly..."
+    # Get main activity of package
     local main_activity=$(su -c "pm dump $pkg 2>/dev/null | grep 'android.intent.action.MAIN' -A2 | grep 'Activity:' | head -1 | awk '{print \$2}'")
 
     if [ -n "$main_activity" ]; then
@@ -559,67 +559,67 @@ do_rejoin() {
     local rejoin_delay=$(get_config ".timing.rejoin_delay // 8")
     local attempt=0
 
-    log_warn "🔄 BẮT ĐẦU REJOIN | Lý do: $reason | Package: $pkg"
+    log_warn "🔄 REJOIN STARTED | Reason: $reason | Package: $pkg"
     send_webhook_rejoin "$pkg" "$reason"
     increment_stat "total_rejoins"
     update_stat "last_rejoin" "$(date '+%Y-%m-%d %H:%M:%S')"
 
     while [ $attempt -lt $max_retries ]; do
         attempt=$((attempt + 1))
-        log_info "Lần thử $attempt/$max_retries..."
+        log_info "Attempt $attempt/$max_retries..."
 
-        # Bước 1: Kill app
+        # Step 1: Kill app
         kill_roblox "$pkg"
 
-        # Bước 2: Đợi
-        log_info "Đợi ${rejoin_delay}s trước khi rejoin..."
+        # Step 2: Wait
+        log_info "Waiting ${rejoin_delay}s before rejoining..."
         sleep "$rejoin_delay"
 
-        # Bước 3: Thử deep link
+        # Step 3: Try deep link
         if rejoin_deeplink "$pkg"; then
             sleep 5
-            # Kiểm tra app có chạy không
+            # Check if app is running
             local pid=$(su -c "pidof $pkg 2>/dev/null")
             if [ -n "$pid" ]; then
-                log_ok "✅ Rejoin thành công! PID: $pid"
+                log_ok "✅ Rejoin successful! PID: $pid"
                 send_webhook_success "$pkg" "$attempt"
                 return 0
             fi
         fi
 
-        # Bước 4: Fallback
+        # Step 4: Fallback
         rejoin_direct "$pkg"
         sleep 5
 
         local pid=$(su -c "pidof $pkg 2>/dev/null")
         if [ -n "$pid" ]; then
-            log_ok "✅ Rejoin thành công (fallback)! PID: $pid"
+            log_ok "✅ Rejoin successful (fallback)! PID: $pid"
             send_webhook_success "$pkg" "$attempt"
             return 0
         fi
 
         local cooldown=$(get_config ".timing.retry_cooldown // 30")
-        log_warn "Thất bại lần $attempt, đợi ${cooldown}s..."
+        log_warn "Failed attempt $attempt, waiting ${cooldown}s..."
         sleep "$cooldown"
     done
 
-    log_err "❌ Rejoin thất bại sau $max_retries lần thử!"
+    log_err "❌ Rejoin failed after $max_retries attempts!"
     send_webhook_crash "$pkg"
     increment_stat "total_crashes"
     return 1
 }
 EOFREJOIN
 
-    # Tạo lib/webhook.sh
+    # Create lib/webhook.sh
     cat > "$LIB_DIR/webhook.sh" << 'EOFWEBHOOK'
 #!/data/data/com.termux/files/usr/bin/bash
 # ============================================================
-#  WEBHOOK - Gửi thông báo Discord
+#  WEBHOOK - Send Discord notification
 # ============================================================
 
 source "$HOME/roblox-rejoin/lib/utils.sh" 2>/dev/null
 
-# ---------- Gửi embed Discord ----------
+# ---------- Send Discord embed ----------
 send_discord() {
     local title=$1 description=$2 color=${3:-"3447003"} footer=$4
 
@@ -661,8 +661,8 @@ send_webhook_rejoin() {
     [ "$notify" != "true" ] && return
     send_discord \
         "🔄 Auto Rejoin Triggered" \
-        "**Package:** \`$pkg\`\n**Lý do:** $reason\n**Thời gian:** $(date '+%H:%M:%S')" \
-        "16776960"  # Màu vàng
+        "**Package:** \`$pkg\`\n**Reason:** $reason\n**Time:** $(date '+%H:%M:%S')" \
+        "16776960"  # Yellow
 }
 
 send_webhook_success() {
@@ -670,9 +670,9 @@ send_webhook_success() {
     local notify=$(get_config ".webhook.notify_success")
     [ "$notify" != "true" ] && return
     send_discord \
-        "✅ Rejoin Thành Công" \
-        "**Package:** \`$pkg\`\n**Lần thử:** $attempt\n**Thời gian:** $(date '+%H:%M:%S')" \
-        "3066993"  # Màu xanh lá
+        "✅ Rejoin Successful" \
+        "**Package:** \`$pkg\`\n**Attempt:** $attempt\n**Time:** $(date '+%H:%M:%S')" \
+        "3066993"  # Green
 }
 
 send_webhook_crash() {
@@ -680,34 +680,34 @@ send_webhook_crash() {
     local notify=$(get_config ".webhook.notify_crash")
     [ "$notify" != "true" ] && return
     send_discord \
-        "❌ Rejoin Thất Bại" \
-        "**Package:** \`$pkg\`\n**Đã thử hết số lần tối đa!**\n**Thời gian:** $(date '+%H:%M:%S')" \
-        "15158332"  # Màu đỏ
+        "❌ Rejoin Failed" \
+        "**Package:** \`$pkg\`\n**Exhausted all retries!**\n**Time:** $(date '+%H:%M:%S')" \
+        "15158332"  # Red
 }
 EOFWEBHOOK
 
-    # Tạo lib/advanced.sh
+    # Create lib/advanced.sh
     cat > "$LIB_DIR/advanced.sh" << 'EOFADVANCED'
 #!/data/data/com.termux/files/usr/bin/bash
 # ============================================================
-#  ADVANCED - Tính năng nâng cao
+#  ADVANCED - Advanced features
 # ============================================================
 
 source "$HOME/roblox-rejoin/lib/utils.sh"
 
-# ---------- Xoá cache tất cả Roblox packages ----------
+# ---------- Clear cache for all Roblox packages ----------
 adv_clear_all_cache() {
-    echo -e "${YELLOW}Đang xoá cache tất cả Roblox packages...${RESET}"
+    echo -e "${YELLOW}Clearing cache for all Roblox packages...${RESET}"
     local packages=$(jq -r '.packages[].pkg' "$CONFIG_FILE")
     while IFS= read -r pkg; do
-        echo -ne "  Xoá cache $pkg..."
+        echo -ne "  Clear cache $pkg..."
         su -c "pm clear $pkg 2>/dev/null" && echo -e " ${GREEN}✓${RESET}" || echo -e " ${RED}✗${RESET}"
     done <<< "$packages"
 }
 
-# ---------- Kill tất cả Roblox ----------
+# ---------- Kill all Roblox ----------
 adv_kill_all() {
-    echo -e "${YELLOW}Kill tất cả Roblox packages...${RESET}"
+    echo -e "${YELLOW}Kill all Roblox packages...${RESET}"
     local packages=$(jq -r '.packages[].pkg' "$CONFIG_FILE")
     while IFS= read -r pkg; do
         su -c "am force-stop $pkg 2>/dev/null"
@@ -715,27 +715,27 @@ adv_kill_all() {
     done <<< "$packages"
 }
 
-# ---------- Đổi Android ID (tránh ban) ----------
+# ---------- Change Android ID (avoid ban) ----------
 adv_change_android_id() {
-    echo -e "${YELLOW}⚠ Đổi Android ID sẽ ảnh hưởng đến một số app khác!${RESET}"
-    echo -ne "Xác nhận? (y/N): "
+    echo -e "${YELLOW}⚠ Changing Android ID will affect some other apps!${RESET}"
+    echo -ne "Confirm? (y/N): "
     read -r confirm
     [ "$confirm" != "y" ] && [ "$confirm" != "Y" ] && return
 
-    # Tạo ID ngẫu nhiên 16 ký tự hex
+    # Generate random 16-char hex ID
     local new_id=$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 16)
     su -c "settings put secure android_id $new_id 2>/dev/null"
-    echo -e "${GREEN}Android ID mới: $new_id${RESET}"
-    log_ok "Đã đổi Android ID: $new_id"
+    echo -e "${GREEN}New Android ID: $new_id${RESET}"
+    log_ok "Changed Android ID: $new_id"
 }
 
-# ---------- Xem/Xoá log ----------
+# ---------- View/Delete log ----------
 adv_view_logs() {
     local log_dir="$INSTALL_DIR/logs"
     local logs=($(ls -t "$log_dir"/*.log 2>/dev/null))
 
     if [ ${#logs[@]} -eq 0 ]; then
-        echo -e "${YELLOW}Chưa có log nào.${RESET}"
+        echo -e "${YELLOW}No logs yet.${RESET}"
         return
     fi
 
@@ -744,7 +744,7 @@ adv_view_logs() {
         echo "  $((i+1)). $(basename ${logs[$i]}) ($(du -sh ${logs[$i]} | cut -f1))"
     done
 
-    echo -ne "\nChọn log (1-${#logs[@]}) hoặc Enter để hủy: "
+    echo -ne "\nSelect log (1-${#logs[@]}) or Enter to cancel: "
     read -r choice
     [ -z "$choice" ] && return
 
@@ -755,75 +755,75 @@ adv_view_logs() {
 
 adv_clear_logs() {
     rm -f "$INSTALL_DIR/logs/"*.log
-    echo -e "${GREEN}Đã xoá tất cả log files${RESET}"
+    echo -e "${GREEN}Deleted all log files${RESET}"
 }
 
-# ---------- Kiểm tra phiên bản Roblox đang cài ----------
+# ---------- Check installed Roblox version ----------
 adv_show_packages_info() {
-    echo -e "${CYAN}Thông tin các package Roblox:${RESET}"
+    echo -e "${CYAN}Roblox packages info:${RESET}"
     line
     local packages=$(jq -r '.packages[] | "\(.pkg)|\(.name)"' "$CONFIG_FILE")
     while IFS='|' read -r pkg name; do
         local version=$(su -c "pm dump $pkg 2>/dev/null | grep versionName | head -1 | awk -F= '{print \$2}'" 2>/dev/null)
-        local status="❌ Chưa cài"
+        local status="❌ Not installed"
         [ -n "$version" ] && status="✅ v$version"
         printf "  %-30s %-20s %s\n" "$name" "$pkg" "$status"
     done <<< "$packages"
     line
 }
 
-# ---------- Menu Advanced ----------
+# ---------- Advanced Menu ----------
 menu_advanced() {
     while true; do
         clear
         print_header
         echo -e "\n${BOLD}  ⚙ ADVANCED SETTINGS${RESET}\n"
-        echo "  1. 🗑  Xoá cache tất cả Roblox"
-        echo "  2. 💀 Kill tất cả Roblox"
-        echo "  3. 🔀 Đổi Android ID"
-        echo "  4. 📋 Xem log files"
-        echo "  5. 🗑  Xoá tất cả log"
-        echo "  6. 📦 Thông tin packages đã cài"
-        echo "  7. ↩  Quay lại"
+        echo "  1. 🗑  Clear cache for all Roblox"
+        echo "  2. 💀 Kill all Roblox"
+        echo "  3. 🔀 Change Android ID"
+        echo "  4. 📋 View log files"
+        echo "  5. 🗑  Clear all logs"
+        echo "  6. 📦 Installed packages info"
+        echo "  7. ↩  Back"
         line
-        echo -ne "${CYAN}Chọn: ${RESET}"
+        echo -ne "${CYAN}Select: ${RESET}"
         read -r choice
 
         case $choice in
-            1) adv_clear_all_cache; read -rp "Enter để tiếp tục..." ;;
-            2) adv_kill_all; read -rp "Enter để tiếp tục..." ;;
-            3) adv_change_android_id; read -rp "Enter để tiếp tục..." ;;
+            1) adv_clear_all_cache; read -rp "Press Enter to continue..." ;;
+            2) adv_kill_all; read -rp "Press Enter to continue..." ;;
+            3) adv_change_android_id; read -rp "Press Enter to continue..." ;;
             4) adv_view_logs ;;
-            5) adv_clear_logs; read -rp "Enter để tiếp tục..." ;;
-            6) adv_show_packages_info; read -rp "Enter để tiếp tục..." ;;
+            5) adv_clear_logs; read -rp "Press Enter to continue..." ;;
+            6) adv_show_packages_info; read -rp "Press Enter to continue..." ;;
             7) break ;;
-            *) echo -e "${RED}Lựa chọn không hợp lệ!${RESET}"; sleep 1 ;;
+            *) echo -e "${RED}Invalid selection!${RESET}"; sleep 1 ;;
         esac
     done
 }
 EOFADVANCED
 
-    # Tạo lib/menu.sh
+    # Create lib/menu.sh
     cat > "$LIB_DIR/menu.sh" << 'EOFMENU'
 #!/data/data/com.termux/files/usr/bin/bash
 # ============================================================
-#  MENU - Giao diện menu chính
+#  MENU - Main menu interface
 # ============================================================
 
 source "$HOME/roblox-rejoin/lib/utils.sh"
 source "$HOME/roblox-rejoin/lib/advanced.sh"
 
-# ---------- Menu quản lý packages ----------
+# ---------- Package management menu ----------
 menu_packages() {
     while true; do
         clear
         print_header
-        echo -e "\n${BOLD}  📦 QUẢN LÝ PACKAGE${RESET}\n"
+        echo -e "\n${BOLD}  📦 MANAGE PACKAGE${RESET}\n"
 
-        # Hiển thị packages hiện tại
+        # Show current packages
         local i=1
         local active=$(get_config ".active_package")
-        echo -e "  ${DIM}Packages hiện tại:${RESET}"
+        echo -e "  ${DIM}Current packages:${RESET}"
         line
         while IFS='|' read -r pkg name enabled; do
             local mark="${RED}○${RESET}"
@@ -835,57 +835,57 @@ menu_packages() {
         line
         echo "  ${YELLOW}★${RESET} = Active  ${GREEN}●${RESET} = Enabled  ${RED}○${RESET} = Disabled"
         echo ""
-        echo "  A. Thêm package mới"
-        echo "  S. Chọn package active"
-        echo "  D. Xoá package"
+        echo "  A. Add new package"
+        echo "  S. Select active package"
+        echo "  D. Delete package"
         echo "  T. Toggle enable/disable"
-        echo "  B. Quay lại"
+        echo "  B. Back"
         line
-        echo -ne "${CYAN}Chọn: ${RESET}"
+        echo -ne "${CYAN}Select: ${RESET}"
         read -r choice
 
         case ${choice,,} in
             a)
-                echo -ne "Tên hiển thị (vd: Delta Executor): "
+                echo -ne "Display name (e.g. Delta Executor): "
                 read -r name
-                echo -ne "Package name (vd: com.vng.njnj): "
+                echo -ne "Package name (e.g. com.vng.njnj): "
                 read -r pkg
-                # Thêm vào config
+                # Add to config
                 local tmp=$(mktemp)
                 jq ".packages += [{\"name\":\"$name\",\"pkg\":\"$pkg\",\"enabled\":true}]" \
                     "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
-                echo -e "${GREEN}Đã thêm: $name ($pkg)${RESET}"
+                echo -e "${GREEN}Added: $name ($pkg)${RESET}"
                 sleep 1
                 ;;
             s)
-                echo -ne "Nhập số thứ tự package muốn chọn: "
+                echo -ne "Enter package number to select: "
                 read -r num
                 local new_pkg=$(jq -r ".packages[$((num-1))].pkg // empty" "$CONFIG_FILE")
                 if [ -n "$new_pkg" ]; then
                     set_config ".active_package" "\"$new_pkg\""
-                    echo -e "${GREEN}Đã chọn: $new_pkg${RESET}"
+                    echo -e "${GREEN}Selected: $new_pkg${RESET}"
                 else
-                    echo -e "${RED}Số không hợp lệ!${RESET}"
+                    echo -e "${RED}Invalid number!${RESET}"
                 fi
                 sleep 1
                 ;;
             d)
-                echo -ne "Nhập số thứ tự package muốn xoá: "
+                echo -ne "Enter package number to delete: "
                 read -r num
                 local tmp=$(mktemp)
                 jq "del(.packages[$((num-1))])" "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
-                echo -e "${GREEN}Đã xoá!${RESET}"
+                echo -e "${GREEN}Deleted!${RESET}"
                 sleep 1
                 ;;
             t)
-                echo -ne "Nhập số thứ tự package: "
+                echo -ne "Enter package number: "
                 read -r num
                 local cur=$(jq -r ".packages[$((num-1))].enabled" "$CONFIG_FILE")
                 local new_val="true"
                 [ "$cur" = "true" ] && new_val="false"
                 local tmp=$(mktemp)
                 jq ".packages[$((num-1))].enabled = $new_val" "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
-                echo -e "${GREEN}Đã toggle: $new_val${RESET}"
+                echo -e "${GREEN}Toggled: $new_val${RESET}"
                 sleep 1
                 ;;
             b) break ;;
@@ -893,7 +893,7 @@ menu_packages() {
     done
 }
 
-# ---------- Menu cấu hình game ----------
+# ---------- Game config menu ----------
 menu_game_config() {
     clear
     print_header
@@ -904,33 +904,33 @@ menu_game_config() {
     local cur_private=$(get_config ".game.is_private")
     local cur_link=$(get_config ".game.full_link")
 
-    echo -e "  Config hiện tại:"
-    echo -e "  Place ID: ${CYAN}${cur_pid:-chưa đặt}${RESET}"
+    echo -e "  Current config:"
+    echo -e "  Place ID: ${CYAN}${cur_pid:-not set}${RESET}"
     echo -e "  Private:  ${CYAN}$cur_private${RESET}"
-    echo -e "  VIP Link: ${CYAN}${cur_link:-chưa đặt}${RESET}"
+    echo -e "  VIP Link: ${CYAN}${cur_link:-not set}${RESET}"
     line
     echo ""
-    echo "  1. Nhập Place ID (public game)"
-    echo "  2. Nhập VIP/Private Server Link"
-    echo "  3. Xoá cấu hình game"
-    echo "  4. Quay lại"
+    echo "  1. Enter Place ID (public game)"
+    echo "  2. Enter VIP/Private Server Link"
+    echo "  3. Clear game config"
+    echo "  4. Back"
     line
-    echo -ne "${CYAN}Chọn: ${RESET}"
+    echo -ne "${CYAN}Select: ${RESET}"
     read -r choice
 
     case $choice in
         1)
-            echo -ne "Nhập Place ID: "
+            echo -ne "Enter Place ID: "
             read -r pid
             set_config ".game.place_id" "\"$pid\""
             set_config ".game.is_private" "false"
             set_config ".game.full_link" "null"
             set_config ".game.access_code" "null"
-            echo -e "${GREEN}Đã lưu Place ID: $pid${RESET}"
+            echo -e "${GREEN}Saved Place ID: $pid${RESET}"
             ;;
         2)
-            echo -e "${DIM}Ví dụ: https://www.roblox.com/games/12345678?privateServerLinkCode=XXXXX${RESET}"
-            echo -ne "Nhập VIP link: "
+            echo -e "${DIM}Example: https://www.roblox.com/games/12345678?privateServerLinkCode=XXXXX${RESET}"
+            echo -ne "Enter VIP link: "
             read -r link
             # Parse link
             local pid=$(echo "$link" | grep -oE '/games/[0-9]+' | grep -oE '[0-9]+')
@@ -939,20 +939,20 @@ menu_game_config() {
             set_config ".game.place_id" "\"$pid\""
             set_config ".game.access_code" "\"$code\""
             set_config ".game.is_private" "true"
-            echo -e "${GREEN}Đã lưu VIP server: Place $pid${RESET}"
+            echo -e "${GREEN}Saved VIP server: Place $pid${RESET}"
             ;;
         3)
             set_config ".game.place_id" "null"
             set_config ".game.access_code" "null"
             set_config ".game.full_link" "null"
             set_config ".game.is_private" "false"
-            echo -e "${GREEN}Đã xoá config game${RESET}"
+            echo -e "${GREEN}Cleared game config${RESET}"
             ;;
     esac
     sleep 1
 }
 
-# ---------- Menu webhook ----------
+# ---------- Webhook menu ----------
 menu_webhook() {
     clear
     print_header
@@ -960,17 +960,17 @@ menu_webhook() {
 
     local cur_url=$(get_config ".webhook.url")
     local cur_enabled=$(get_config ".webhook.enabled")
-    echo -e "  Webhook URL: ${CYAN}${cur_url:-chưa đặt}${RESET}"
-    echo -e "  Trạng thái: $([ "$cur_enabled" = "true" ] && echo "${GREEN}BẬT${RESET}" || echo "${RED}TẮT${RESET}")"
+    echo -e "  Webhook URL: ${CYAN}${cur_url:-not set}${RESET}"
+    echo -e "  Status: $([ "$cur_enabled" = "true" ] && echo "${GREEN}ON${RESET}" || echo "${RED}OFF${RESET}")"
     line
-    echo "  1. Đặt Webhook URL"
-    echo "  2. Toggle bật/tắt"
-    echo "  3. Cài notify_rejoin ($(get_config '.webhook.notify_rejoin'))"
-    echo "  4. Cài notify_crash ($(get_config '.webhook.notify_crash'))"
+    echo "  1. Set Webhook URL"
+    echo "  2. Toggle on/off"
+    echo "  3. Set notify_rejoin ($(get_config '.webhook.notify_rejoin'))"
+    echo "  4. Set notify_crash ($(get_config '.webhook.notify_crash'))"
     echo "  5. Test webhook"
-    echo "  6. Quay lại"
+    echo "  6. Back"
     line
-    echo -ne "${CYAN}Chọn: ${RESET}"
+    echo -ne "${CYAN}Select: ${RESET}"
     read -r choice
 
     case $choice in
@@ -979,12 +979,12 @@ menu_webhook() {
             read -r url
             set_config ".webhook.url" "\"$url\""
             set_config ".webhook.enabled" "true"
-            echo -e "${GREEN}Đã lưu!${RESET}"
+            echo -e "${GREEN}Saved!${RESET}"
             ;;
         2)
             local cur=$(get_config ".webhook.enabled")
             [ "$cur" = "true" ] && set_config ".webhook.enabled" "false" || set_config ".webhook.enabled" "true"
-            echo -e "${GREEN}Đã toggle!${RESET}"
+            echo -e "${GREEN}Toggled!${RESET}"
             ;;
         3)
             local cur=$(get_config ".webhook.notify_rejoin")
@@ -996,14 +996,14 @@ menu_webhook() {
             ;;
         5)
             source "$HOME/roblox-rejoin/lib/webhook.sh"
-            send_discord "🧪 Test Webhook" "Kết nối thành công từ Roblox AutoRejoin!" "3066993"
-            echo -e "${GREEN}Đã gửi test message!${RESET}"
+            send_discord "🧪 Test Webhook" "Connection successful from Roblox AutoRejoin!" "3066993"
+            echo -e "${GREEN}Test message sent!${RESET}"
             ;;
     esac
     sleep 1
 }
 
-# ---------- Hiển thị status ----------
+# ---------- Show status ----------
 show_status() {
     clear
     print_header
@@ -1014,61 +1014,61 @@ show_status() {
     local is_private=$(get_config ".game.is_private")
     local total_rejoins=$(get_config ".stats.total_rejoins // 0")
     local total_crashes=$(get_config ".stats.total_crashes // 0")
-    local last_rejoin=$(get_config ".stats.last_rejoin // \"chưa có\"")
+    local last_rejoin=$(get_config ".stats.last_rejoin // \"none\"")
     local ram=$(get_ram_info)
     local uptime=$(get_uptime)
     local webhook_enabled=$(get_config ".webhook.enabled")
 
-    echo -e "  ${CYAN}Package active:${RESET}  $active_pkg"
-    echo -e "  ${CYAN}Place ID:${RESET}        ${place_id:-chưa đặt}"
+    echo -e "  ${CYAN}Active package:${RESET}  $active_pkg"
+    echo -e "  ${CYAN}Place ID:${RESET}        ${place_id:-not set}"
     echo -e "  ${CYAN}Private server:${RESET}  $is_private"
     line
     echo -e "  ${CYAN}RAM:${RESET}             $ram"
     echo -e "  ${CYAN}Uptime:${RESET}          $uptime"
     line
-    echo -e "  ${GREEN}Tổng rejoin:${RESET}     $total_rejoins"
-    echo -e "  ${RED}Tổng crash:${RESET}      $total_crashes"
-    echo -e "  ${CYAN}Rejoin cuối:${RESET}     $last_rejoin"
+    echo -e "  ${GREEN}Total rejoins:${RESET}     $total_rejoins"
+    echo -e "  ${RED}Total crashes:${RESET}      $total_crashes"
+    echo -e "  ${CYAN}Last rejoin:${RESET}     $last_rejoin"
     line
-    echo -e "  ${CYAN}Webhook:${RESET}         $([ "$webhook_enabled" = "true" ] && echo "${GREEN}BẬT${RESET}" || echo "${RED}TẮT${RESET}")"
+    echo -e "  ${CYAN}Webhook:${RESET}         $([ "$webhook_enabled" = "true" ] && echo "${GREEN}ON${RESET}" || echo "${RED}OFF${RESET}")"
     line
 
-    # Kiểm tra Roblox đang chạy không
+    # Check if Roblox is running
     local pid=$(su -c "pidof $active_pkg 2>/dev/null")
     if [ -n "$pid" ]; then
-        echo -e "  ${GREEN}● Roblox đang chạy${RESET} (PID: $pid)"
+        echo -e "  ${GREEN}● Roblox is running${RESET} (PID: $pid)"
     else
-        echo -e "  ${RED}● Roblox không chạy${RESET}"
+        echo -e "  ${RED}● Roblox not running${RESET}"
     fi
 
     echo ""
-    read -rp "  Enter để quay lại..."
+    read -rp "  Press Enter to go back..."
 }
 EOFMENU
 
     chmod +x "$LIB_DIR"/*.sh
-    log_ok "Tất cả lib files đã được tạo!"
+    log_ok "All lib files have been created!"
 }
 
-# ---------- Hoàn tất ----------
+# ---------- Done ----------
 print_done() {
     echo ""
     echo -e "${GREEN}╔══════════════════════════════════════════════╗${RESET}"
-    echo -e "${GREEN}║      ✅  CÀI ĐẶT HOÀN TẤT THÀNH CÔNG!      ║${RESET}"
+    echo -e "${GREEN}║      ✅  INSTALLATION COMPLETED SUCCESSFULLY!      ║${RESET}"
     echo -e "${GREEN}╚══════════════════════════════════════════════╝${RESET}"
     echo ""
-    echo -e "  📂 Thư mục: ${CYAN}$INSTALL_DIR${RESET}"
+    echo -e "  Directory: ${CYAN}$INSTALL_DIR${RESET}"
     echo -e "  ⚙  Config:  ${CYAN}$CONFIG_DIR/config.json${RESET}"
     echo -e "  📝 Logs:    ${CYAN}$LOG_DIR${RESET}"
     echo ""
-    echo -e "  ${BOLD}CÁCH SỬ DỤNG:${RESET}"
-    echo -e "  ${YELLOW}▶  Gõ 'rblx' hoặc 'bash $INSTALL_DIR/main.sh'${RESET}"
+    echo -e "  ${BOLD}HOW TO USE:${RESET}"
+    echo -e "  ${YELLOW}▶  Type 'rblx' or 'bash $INSTALL_DIR/main.sh'${RESET}"
     echo ""
-    echo -e "  ${DIM}Bước tiếp theo:${RESET}"
-    echo "  1. Gõ 'rblx' để mở tool"
-    echo "  2. Menu 1: Chọn package Roblox của bạn"
-    echo "  3. Menu 2: Nhập Place ID hoặc VIP link"
-    echo "  4. Menu 3: Bật Auto Rejoin"
+    echo -e "  ${DIM}Next steps:${RESET}"
+    echo "  1. Type 'rblx' to open the tool"
+    echo "  2. Menu 1: Select your Roblox package"
+    echo "  3. Menu 2: Enter Place ID or VIP link"
+    echo "  4. Menu 3: Enable Auto Rejoin"
     echo ""
 }
 
@@ -1077,7 +1077,7 @@ print_done() {
 # ============================================================
 main_install() {
     print_banner
-    echo -e "${WHITE}Bắt đầu cài đặt Roblox Auto Rejoin...${RESET}\n"
+    echo -e "${WHITE}Starting Roblox Auto Rejoin installation...${RESET}\n"
 
     check_root
     install_dependencies
@@ -1088,8 +1088,8 @@ main_install() {
     setup_alias
     print_done
 
-    # Hỏi chạy ngay không
-    echo -ne "${CYAN}Mở tool ngay bây giờ? (y/N): ${RESET}"
+    # Ask to run immediately
+    echo -ne "${CYAN}Open tool now? (y/N): ${RESET}"
     read -r run_now
     if [ "${run_now,,}" = "y" ]; then
         exec bash "$INSTALL_DIR/main.sh"

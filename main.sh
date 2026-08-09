@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # ============================================================
 #  ROBLOX AUTO REJOIN - MAIN ENTRY POINT
-#  Khởi chạy: bash main.sh  hoặc  gõ 'rblx'
+#  Launch: bash main.sh  or  type 'rblx'
 # ============================================================
 
 INSTALL_DIR="$HOME/roblox-rejoin"
@@ -9,36 +9,36 @@ CONFIG_FILE="$INSTALL_DIR/config/config.json"
 LIB_DIR="$INSTALL_DIR/lib"
 LOG_DIR="$INSTALL_DIR/logs"
 
-# ---------- Load tất cả libraries ----------
+# ---------- Load all libraries ----------
 for lib in utils detect rejoin webhook menu advanced; do
     src="$LIB_DIR/${lib}.sh"
     if [ ! -f "$src" ]; then
-        echo "[ERR] Thiếu file: $src"
-        echo "Chạy lại install.sh để sửa!"
+        echo "[ERR] Missing file: $src"
+        echo "Run install.sh again to fix!"
         exit 1
     fi
     source "$src"
 done
 
-# ---------- PID file để quản lý background process ----------
+# ---------- PID file to manage background process ----------
 PID_FILE="$INSTALL_DIR/.rejoin.pid"
 MONITOR_LOG="$LOG_DIR/monitor_$(date +%Y%m%d).log"
 
 # ============================================================
-#  VÒNG LẶP AUTO REJOIN CHÍNH
+#  MAIN AUTO REJOIN LOOP
 # ============================================================
 rejoin_loop() {
     local pkg=$1
     local check_interval; check_interval=$(get_config ".timing.check_interval // 5")
 
-    log_ok "Auto Rejoin BAT | Package: $pkg | Interval: ${check_interval}s"
+    log_ok "Auto Rejoin ON | Package: $pkg | Interval: ${check_interval}s"
     update_stat "start_time" "$(date +%s)"
 
     local auto_clear; auto_clear=$(get_config ".advanced.auto_clear_cache")
     local clear_interval; clear_interval=$(get_config ".advanced.clear_cache_interval // 3600")
     local last_clear; last_clear=$(date +%s)
 
-    log_info "Khoi dong game lan dau..."
+    log_info "Starting game for the first time..."
     do_rejoin "$pkg" "initial_start"
     sleep "$check_interval"
 
@@ -48,7 +48,7 @@ rejoin_loop() {
         if [ "$auto_clear" = "true" ]; then
             local elapsed=$(( now - last_clear ))
             if [ "$elapsed" -ge "$clear_interval" ]; then
-                log_info "Auto clear cache dinh ky..."
+                log_info "Periodic auto clear cache..."
                 su -c "pm clear $pkg 2>/dev/null" </dev/null
                 last_clear=$now
             fi
@@ -58,58 +58,58 @@ rejoin_loop() {
 
         if [[ "$status" == rejoin:* ]]; then
             local reason="${status#rejoin:}"
-            log_warn "Phat hien can rejoin! Ly do: $reason"
+            log_warn "Rejoin needed! Reason: $reason"
             do_rejoin "$pkg" "$reason"
         else
             local pid; pid=$(su -c "pidof '$pkg' 2>/dev/null" </dev/null | awk '{print $1}')
-            log_info "Game OK | PID: ${pid:-?} | Kiem tra tiep sau ${check_interval}s"
+            log_info "Game OK | PID: ${pid:-?} | Next check in ${check_interval}s"
         fi
 
         sleep "$check_interval"
     done
 }
 
-# ---------- Bắt đầu auto rejoin ----------
+# ---------- Start auto rejoin ----------
 start_rejoin() {
     local pkg; pkg=$(get_config ".active_package")
     local place_id; place_id=$(get_config ".game.place_id")
     local full_link; full_link=$(get_config ".game.full_link")
 
     if [ -z "$pkg" ] || [ "$pkg" = "null" ]; then
-        echo -e "${RED}[!] Chua chon package! Vao Menu 1 de chon.${RESET}"
+        echo -e "${RED}[!] No package selected! Go to Menu 1 to select.${RESET}"
         sleep 2; return 1
     fi
 
     if { [ -z "$place_id" ] || [ "$place_id" = "null" ]; } && \
        { [ -z "$full_link" ] || [ "$full_link" = "null" ]; }; then
-        echo -e "${RED}[!] Chua cau hinh game! Vao Menu 2 de nhap Place ID.${RESET}"
+        echo -e "${RED}[!] Game not configured! Go to Menu 2 to enter Place ID.${RESET}"
         sleep 2; return 1
     fi
 
     if [ -f "$PID_FILE" ]; then
         local old_pid; old_pid=$(cat "$PID_FILE")
         if kill -0 "$old_pid" 2>/dev/null; then
-            echo -e "${YELLOW}[!] Auto Rejoin dang chay (PID: $old_pid)!${RESET}"
-            echo -ne "Khoi dong lai? (y/N): "
+            echo -e "${YELLOW}[!] Auto Rejoin already running (PID: $old_pid)!${RESET}"
+            echo -ne "Restart? (y/N): "
             read -r confirm </dev/tty
             [ "${confirm,,}" != "y" ] && return
             stop_rejoin
         fi
     fi
 
-    echo -e "${GREEN}[->] Bat dau Auto Rejoin cho: $pkg${RESET}"
+    echo -e "${GREEN}[->] Starting Auto Rejoin for: $pkg${RESET}"
     rejoin_loop "$pkg" >> "$MONITOR_LOG" 2>&1 &
     local bg_pid=$!
     echo "$bg_pid" > "$PID_FILE"
-    echo -e "${GREEN}[OK] Dang chay ngam | PID: $bg_pid | Log: $MONITOR_LOG${RESET}"
-    echo -e "${DIM}Dung 'rblx log' de xem log realtime${RESET}"
+    echo -e "${GREEN}[OK] Running in background | PID: $bg_pid | Log: $MONITOR_LOG${RESET}"
+    echo -e "${DIM}Use 'rblx log' to view realtime log${RESET}"
     sleep 2
 }
 
-# ---------- Dừng auto rejoin ----------
+# ---------- Stop auto rejoin ----------
 stop_rejoin() {
     if [ ! -f "$PID_FILE" ]; then
-        echo -e "${YELLOW}[!] Auto Rejoin khong chay.${RESET}"
+        echo -e "${YELLOW}[!] Auto Rejoin is not running.${RESET}"
         sleep 1; return
     fi
 
@@ -119,15 +119,15 @@ stop_rejoin() {
         sleep 1
         kill -9 "$pid" 2>/dev/null
         rm -f "$PID_FILE"
-        echo -e "${GREEN}[OK] Da dung Auto Rejoin (PID: $pid)${RESET}"
+        echo -e "${GREEN}[OK] Stopped Auto Rejoin (PID: $pid)${RESET}"
     else
-        echo -e "${YELLOW}[!] Process khong ton tai, don PID file...${RESET}"
+        echo -e "${YELLOW}[!] Process not found, cleaning PID file...${RESET}"
         rm -f "$PID_FILE"
     fi
     sleep 1
 }
 
-# ---------- Kiểm tra trạng thái rejoin ----------
+# ---------- Check rejoin status ----------
 get_rejoin_status() {
     if [ -f "$PID_FILE" ]; then
         local pid; pid=$(cat "$PID_FILE")
@@ -142,7 +142,7 @@ get_rejoin_status() {
     fi
 }
 
-# ---------- Menu cài đặt timing ----------
+# ---------- Timing settings menu ----------
 menu_timing() {
     while true; do
         clear
@@ -161,39 +161,39 @@ menu_timing() {
         echo -e "  Max retries:     ${CYAN}${mr}${RESET}"
         echo -e "  Retry cooldown:  ${CYAN}${rc}s${RESET}"
         line
-        echo "  1. Check Interval (hien tai: ${ci}s, khuyen nghi: 3-10)"
-        echo "  2. Rejoin Delay   (hien tai: ${rd}s, khuyen nghi: 5-15)"
-        echo "  3. Max Retries    (hien tai: ${mr})"
-        echo "  4. Retry Cooldown (hien tai: ${rc}s)"
-        echo "  5. Quay lai"
+        echo "  1. Check Interval (current: ${ci}s, recommended: 3-10)"
+        echo "  2. Rejoin Delay   (current: ${rd}s, recommended: 5-15)"
+        echo "  3. Max Retries    (current: ${mr})"
+        echo "  4. Retry Cooldown (current: ${rc}s)"
+        echo "  5. Back"
         line
-        echo -ne "${CYAN}  Chon: ${RESET}"
+        echo -ne "${CYAN}  Select: ${RESET}"
         read -r choice </dev/tty
 
         case $choice in
-            1) echo -ne "  Check interval (giay): "; read -r v </dev/tty; set_config ".timing.check_interval" "$v" ;;
-            2) echo -ne "  Rejoin delay (giay): ";   read -r v </dev/tty; set_config ".timing.rejoin_delay" "$v" ;;
+            1) echo -ne "  Check interval (seconds): "; read -r v </dev/tty; set_config ".timing.check_interval" "$v" ;;
+            2) echo -ne "  Rejoin delay (seconds): ";   read -r v </dev/tty; set_config ".timing.rejoin_delay" "$v" ;;
             3) echo -ne "  Max retries: ";            read -r v </dev/tty; set_config ".timing.max_retries" "$v" ;;
-            4) echo -ne "  Retry cooldown (giay): "; read -r v </dev/tty; set_config ".timing.retry_cooldown" "$v" ;;
+            4) echo -ne "  Retry cooldown (seconds): "; read -r v </dev/tty; set_config ".timing.retry_cooldown" "$v" ;;
             5) break ;;
         esac
-        [ "$choice" != "5" ] && { echo -e "${GREEN}  Da luu!${RESET}"; sleep 1; }
+        [ "$choice" != "5" ] && { echo -e "${GREEN}  Saved!${RESET}"; sleep 1; }
     done
 }
 
-# ---------- Xem log realtime ----------
+# ---------- View realtime log ----------
 view_monitor_log() {
     if [ -f "$MONITOR_LOG" ]; then
-        echo -e "${DIM}  Nhan Ctrl+C de thoat...${RESET}"
+        echo -e "${DIM}  Press Ctrl+C to exit...${RESET}"
         tail -f "$MONITOR_LOG"
     else
-        echo -e "${YELLOW}  Chua co log monitor.${RESET}"
+        echo -e "${YELLOW}  No monitor log yet.${RESET}"
         sleep 2
     fi
 }
 
 # ============================================================
-#  MENU CHÍNH
+#  MAIN MENU
 # ============================================================
 main_menu() {
     while true; do
@@ -206,47 +206,47 @@ main_menu() {
         echo -e "${CYAN}  =================================${RESET}"
         echo ""
 
-        # ── Trạng thái (su dùng </dev/null để không nuốt stdin) ──
+        # ── Status (su uses </dev/null to not consume stdin) ──
         local pkg; pkg=$(get_config ".active_package")
         local place; place=$(get_config ".game.place_id")
         local rejoin_st; rejoin_st=$(get_rejoin_status)
 
-        # Chỉ check pidof nếu pkg hợp lệ
+        # Only check pidof if pkg is valid
         local pkg_pid=""
         if [[ "$pkg" =~ ^[a-zA-Z0-9._]+$ ]]; then
             pkg_pid=$(su -c "pidof '$pkg' 2>/dev/null" </dev/null 2>/dev/null | awk '{print $1}')
         fi
 
-        echo -e "  Package : ${CYAN}${pkg:-chua chon}${RESET}"
-        echo -e "  Place ID: ${CYAN}${place:-chua dat}${RESET}"
+        echo -e "  Package : ${CYAN}${pkg:-not selected}${RESET}"
+        echo -e "  Place ID: ${CYAN}${place:-not set}${RESET}"
 
         echo -ne "  Roblox  : "
         if [ -n "$pkg_pid" ]; then
-            echo -e "${GREEN}[CHAY] PID $pkg_pid${RESET}"
+            echo -e "${GREEN}[RUNNING] PID $pkg_pid${RESET}"
         else
-            echo -e "${RED}[DUNG]${RESET}"
+            echo -e "${RED}[STOPPED]${RESET}"
         fi
 
         echo -ne "  Monitor : "
         if [[ "$rejoin_st" == running:* ]]; then
-            echo -e "${GREEN}[BAT] PID ${rejoin_st#running:}${RESET}"
+            echo -e "${GREEN}[ON] PID ${rejoin_st#running:}${RESET}"
         else
-            echo -e "${RED}[TAT]${RESET}"
+            echo -e "${RED}[OFF]${RESET}"
         fi
 
         line
-        echo "  1. Quan ly Package Roblox"
-        echo "  2. Config Game (Place ID / VIP Link)"
-        echo -e "  ${GREEN}3. Bat dau Auto Rejoin${RESET}"
-        echo -e "  ${RED}4. Dung Auto Rejoin${RESET}"
-        echo "  5. Xem Status"
-        echo "  6. Webhook Discord"
-        echo "  7. Cai Timing"
+        echo "  1. Manage Roblox Package"
+        echo "  2. Game Config (Place ID / VIP Link)"
+        echo -e "  ${GREEN}3. Start Auto Rejoin${RESET}"
+        echo -e "  ${RED}4. Stop Auto Rejoin${RESET}"
+        echo "  5. View Status"
+        echo "  6. Discord Webhook"
+        echo "  7. Timing Settings"
         echo "  8. Advanced"
-        echo "  9. Xem Monitor Log (realtime)"
-        echo "  0. Thoat"
+        echo "  9. View Monitor Log (realtime)"
+        echo "  0. Exit"
         line
-        echo -ne "${CYAN}  Chon: ${RESET}"
+        echo -ne "${CYAN}  Select: ${RESET}"
         read -r choice </dev/tty
 
         case $choice in
@@ -261,22 +261,22 @@ main_menu() {
             9) view_monitor_log ;;
             0)
                 if [[ "$(get_rejoin_status)" == running:* ]]; then
-                    echo -ne "${YELLOW}  Auto Rejoin dang chay, van thoat? (y/N): ${RESET}"
+                    echo -ne "${YELLOW}  Auto Rejoin is running, still exit? (y/N): ${RESET}"
                     read -r ex </dev/tty
                     [ "${ex,,}" = "y" ] && break
                 else
                     break
                 fi
                 ;;
-            *) echo -e "${RED}  Lua chon khong hop le!${RESET}"; sleep 0.8 ;;
+            *) echo -e "${RED}  Invalid selection!${RESET}"; sleep 0.8 ;;
         esac
     done
 
-    echo -e "${CYAN}  Tam biet! Monitor van chay ngam neu da bat.${RESET}"
+    echo -e "${CYAN}  Goodbye! Monitor keeps running in background if enabled.${RESET}"
 }
 
 # ============================================================
-#  KHỞI ĐỘNG
+#  STARTUP
 # ============================================================
 case "${1:-}" in
     start)   start_rejoin; exit ;;

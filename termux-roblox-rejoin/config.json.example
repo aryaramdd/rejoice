@@ -1,25 +1,25 @@
 {
-  "_comment": "Copy file này thành config.json và chỉnh sửa theo ý muốn",
+  "_comment": "Copy this file to config.json and edit as needed",
   "version": "2.0.0",
 
   "packages": [
     {
-      "name": "Roblox Gốc",
+      "name": "Official Roblox",
       "pkg": "com.roblox.client",
       "enabled": true,
-      "_comment": "Package name chính thức của Roblox"
+      "_comment": "Official Roblox package name"
     },
     {
       "name": "Delta Executor",
       "pkg": "com.vng.njnj",
       "enabled": false,
-      "_comment": "Thay pkg bằng package name thực của Delta bạn cài (có thể thay đổi theo phiên bản)"
+      "_comment": "Replace pkg with the actual Delta package name (may change per version)"
     },
     {
       "name": "Codex Executor",
       "pkg": "com.codex.client",
       "enabled": false,
-      "_comment": "Thay pkg bằng package name thực của Codex"
+      "_comment": "Replace pkg with the actual Codex package name"
     },
     {
       "name": "Fluxus",
@@ -35,73 +35,73 @@
       "name": "Custom Package",
       "pkg": "com.your.custom.package",
       "enabled": false,
-      "_comment": "Thêm package tùy chỉnh của bạn vào đây"
+      "_comment": "Add your custom package here"
     }
   ],
 
   "active_package": "com.roblox.client",
-  "_comment_pkg": "Package đang được theo dõi chính",
+  "_comment_pkg": "Primary package being monitored",
 
   "game": {
     "place_id": "12345678",
-    "_comment_pid": "Place ID của game bạn muốn farm. Lấy từ URL: roblox.com/games/XXXXXXXXX",
+    "_comment_pid": "Place ID of the game you want to farm. Get it from URL: roblox.com/games/XXXXXXXXX",
     "access_code": "",
-    "_comment_code": "Access code của VIP/Private server (để trống nếu public game)",
+    "_comment_code": "Access code for VIP/Private server (leave empty for public games)",
     "is_private": false,
     "_comment_private": "true = VIP/Private server, false = public game",
     "full_link": "",
-    "_comment_link": "Dán toàn bộ VIP link vào đây thay vì nhập từng phần. Ví dụ: https://www.roblox.com/games/12345678?privateServerLinkCode=ABCDEF123"
+    "_comment_link": "Paste the full VIP link here instead of entering parts. Example: https://www.roblox.com/games/12345678?privateServerLinkCode=ABCDEF123"
   },
 
   "timing": {
     "check_interval": 5,
-    "_comment_ci": "Mỗi X giây kiểm tra trạng thái game 1 lần (khuyến nghị: 3-8)",
+    "_comment_ci": "Check game status every X seconds (recommended: 3-8)",
     "rejoin_delay": 8,
-    "_comment_rd": "Đợi X giây sau khi kill app trước khi rejoin (để app đóng hẳn)",
+    "_comment_rd": "Wait X seconds after killing app before rejoining (let the app fully close)",
     "max_retries": 10,
-    "_comment_mr": "Thử rejoin tối đa bao nhiêu lần trước khi báo thất bại",
+    "_comment_mr": "Maximum rejoin attempts before reporting failure",
     "retry_cooldown": 30,
-    "_comment_rc": "Đợi X giây giữa các lần thử thất bại liên tiếp"
+    "_comment_rc": "Wait X seconds between consecutive failed attempts"
   },
 
   "detection": {
     "use_logcat": true,
-    "_comment_lc": "Dùng logcat để phát hiện disconnect (chính xác nhưng tốn pin hơn)",
+    "_comment_lc": "Use logcat to detect disconnect (more accurate but uses more battery)",
     "use_activity": true,
-    "_comment_act": "Dùng dumpsys activity để kiểm tra top activity (khuyến nghị)",
+    "_comment_act": "Use dumpsys activity to check top activity (recommended)",
     "use_cpu": true,
-    "_comment_cpu": "Monitor CPU usage để phát hiện app idle quá lâu",
+    "_comment_cpu": "Monitor CPU usage to detect prolonged app idle",
     "cpu_threshold": 5,
-    "_comment_ct": "Ngưỡng CPU % - dưới mức này coi là idle",
+    "_comment_ct": "CPU % threshold — below this is considered idle",
     "cpu_low_duration": 20,
-    "_comment_cld": "Số vòng check CPU idle liên tiếp trước khi kết luận cần rejoin"
+    "_comment_cld": "Number of consecutive idle CPU checks before triggering rejoin"
   },
 
   "webhook": {
     "enabled": false,
-    "_comment_wh": "Bật/tắt thông báo Discord",
+    "_comment_wh": "Enable/disable Discord notifications",
     "url": "https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN",
-    "_comment_url": "Webhook URL lấy từ Discord: Server Settings → Integrations → Webhooks",
+    "_comment_url": "Webhook URL from Discord: Server Settings → Integrations → Webhooks",
     "notify_rejoin": true,
     "notify_crash": true,
     "notify_success": true,
     "username": "Roblox AutoRejoin",
-    "_comment_name": "Tên bot hiển thị trong Discord",
+    "_comment_name": "Bot display name in Discord",
     "avatar_url": "https://i.imgur.com/roblox-avatar.png",
-    "_comment_avatar": "Link ảnh đại diện bot (để trống cũng được)"
+    "_comment_avatar": "Bot avatar image URL (can be left empty)"
   },
 
   "advanced": {
     "auto_clear_cache": false,
-    "_comment_acc": "Tự động xoá cache Roblox định kỳ (giúp tránh lỗi tích lũy)",
+    "_comment_acc": "Automatically clear Roblox cache periodically (helps avoid accumulated errors)",
     "clear_cache_interval": 3600,
-    "_comment_cci": "Xoá cache mỗi X giây (3600 = 1 tiếng)",
+    "_comment_cci": "Clear cache every X seconds (3600 = 1 hour)",
     "change_android_id": false,
-    "_comment_cai": "Đổi Android ID sau mỗi lần rejoin (tránh detection, nguy hiểm!)",
+    "_comment_cai": "Change Android ID after each rejoin (to avoid detection, risky!)",
     "auto_boot": false,
-    "_comment_ab": "Tự chạy khi khởi động Termux (cần thêm vào .bashrc)",
+    "_comment_ab": "Auto-run when Termux starts (requires adding to .bashrc)",
     "kill_on_start": true,
-    "_comment_kos": "Kill Roblox hiện tại khi bắt đầu auto rejoin"
+    "_comment_kos": "Kill current Roblox instance when starting auto rejoin"
   },
 
   "stats": {
