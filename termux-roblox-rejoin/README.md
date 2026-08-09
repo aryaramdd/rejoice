@@ -38,7 +38,7 @@
 Open Termux, paste this command and press Enter:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Vyfuyu/Roblox-Rejoinerv10/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/aryaramdd/rejoice/main/install.sh | bash
 ```
 
 **The tool will automatically:**
@@ -239,7 +239,7 @@ Or disable CPU monitor:
 # Manual install:
 pkg update -y
 pkg install curl git jq bc -y
-git clone https://github.com/Vyfuyu/Roblox-Rejoinerv10v10 ~/roblox-rejoin
+git clone https://github.com/aryaramdd/rejoice ~/roblox-rejoin
 cp ~/roblox-rejoin/config.json.example ~/roblox-rejoin/config/config.json
 bash ~/roblox-rejoin/install.sh
 ```
@@ -338,7 +338,7 @@ A: Yes, because it runs in the background in Termux. But make sure Termux is not
 cd ~/roblox-rejoin
 git pull
 # Or run the installer again:
-curl -fsSL https://raw.githubusercontent.com/Vyfuyu/Roblox-Rejoinerv10/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/aryaramdd/rejoice/main/install.sh | bash
 ```
 
 **Q: How to uninstall the tool?**
